@@ -1,4 +1,7 @@
-package com.example.accessingdatamysql;
+package com.example.application.controllers;
+
+import com.example.application.persistence.User;
+import com.example.application.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
