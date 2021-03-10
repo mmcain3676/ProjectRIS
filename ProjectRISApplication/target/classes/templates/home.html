@@ -9,21 +9,39 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script>
         $(document).ready(function(){
-            if(!$('#LoginAlert p').is(':empty'))
-            {
-                $('#LoginAlert').show();
-            }
-
-            $('body').on('click', 'input', function(){
-                $('#LoginAlert').hide();
-            });
+            
         });
     </script>
 </head>
 <body>
     <div class="container">
         <div class="row">
-            <div class="col-sm-2 panel set-center" style="position: absolute; top:25%;">
+            <div class="col-sm-12 sn-navbar">
+                <div class="sn-navbar-btn" onclick="window.location='/home'">
+                    Home
+                </div>
+                <div sec:authorize="hasAuthority('ADMIN')" class="sn-navbar-btn" onclick="window.location='/admin'">
+                    Admin Dashboard
+                </div>
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'REFERRAL_DOCTOR')" class="sn-navbar-btn" onclick="window.location='/referral'">
+                    Referrals
+                </div>
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')" class="sn-navbar-btn" onclick="window.location='/appointments'">
+                    Appointments
+                </div>
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'TECHNICIAN')" class="sn-navbar-btn" onclick="window.location='/imaging'">
+                    Imaging
+                </div>
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/analysis'">
+                    Radiology Analysis
+                </div>
+                <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
+                    Logout
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 panel">
                 <center>
                     <h1>Logged in</h1>
 
@@ -32,20 +50,8 @@
                         <p><i><span sec:authentication="principal.authorities">Roles</span></i></p>
                     </div>
 
-                    <div sec:authorize="hasAnyAuthority('ADMIN', 'REFERRAL_DOCTOR')">
-                        <a href="/new">Referral Doctor Dashboard</a>
-                    </div>
-
-                    <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')">
-                        <a href="/new">Receptionist Dashboard</a>
-                    </div>
-
-                    <div sec:authorize="hasAnyAuthority('ADMIN', 'TECHNICIAN')">
-                        <a href="/new">Technician Dashboard</a>
-                    </div>
-
-                    <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')">
-                        <a href="/new">Radiologist Dashboard</a>
+                    <div sec:authorize="hasAuthority('USER')">
+                        <p><b>Contact your system admin to be assigned a system role.</b></p>
                     </div>
                     
                     <input type="button" class="btn btn-md btn-primary" value="Logout" onclick="window.location='/user_logout'"/>

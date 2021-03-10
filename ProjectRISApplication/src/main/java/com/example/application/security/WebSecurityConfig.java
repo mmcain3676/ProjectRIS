@@ -44,6 +44,7 @@ class LoginRedirectSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests()
             .antMatchers("/css/**", "/images/**").permitAll()
+            .antMatchers("/admin").hasAnyAuthority("ADMIN")
             .antMatchers("/home").hasAnyAuthority("ADMIN", "USER", "REFERRAL_DOCTOR",  "RECEPTIONIST", "TECHNICIAN", "RADIOLOGIST")
             .anyRequest().authenticated()
             
