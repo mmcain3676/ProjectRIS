@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.example.application.persistence.User;
+import com.example.application.repositories.RoleRepository;
 import com.example.application.repositories.UserRepository;
 
 @Controller 
@@ -27,11 +28,15 @@ import com.example.application.repositories.UserRepository;
 public class AdminController {
     @Autowired 
     private UserRepository userRepository;
+    @Autowired 
+    private RoleRepository roleRepository;
 
     @GetMapping("/admin")
     public String homeView(HttpSession session, Model model)
     {
         if (isAuthenticated()) {
+            model.addAttribute("users_list", userRepository.findAll());
+            model.addAttribute("roles_list", roleRepository.findAll());
             return "admin_dashboard";
         }
         else

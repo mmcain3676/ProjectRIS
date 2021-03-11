@@ -31,7 +31,6 @@ body {
     border-width: 2px;
     padding: 25px;
     position: fixed;
-    top: 25%;
     left: 25%;
     width: 50%;
     z-index: 2;
@@ -96,4 +95,8 @@ body {
 
 .view-a:hover {
     text-decoration: underline;
+}
+
+label {
+    font-weight: bold;
 }

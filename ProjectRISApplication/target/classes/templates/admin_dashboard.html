@@ -18,11 +18,32 @@
                 $('.modal-tile').hide();
                 $('.modal, #ModifyUserModal').show();
                 $("body").toggleClass("dialogIsOpen");
+
+                var userRow = $(this).parents('tr');
+                
+
+                $('#UserIDInput').val($(userRow).find('.userId').html());
+                $('#UsernameInput').val($(userRow).find('.username').html());
+                $('#FullNameInput').val($(userRow).find('.fullName').html());
             });
 
             $(document).on('click','.close-modal', function(){
                 $('.modal-tile').hide();
                 $("body").toggleClass("dialogIsOpen");
+            });
+
+            $('.user-password').on('keyup', function(){
+                console.log('change');
+                if($('#ChangeUserPassword').val() == $('#ConfirmUserPassword').val())
+                {
+                    console.log('hide');
+                    $('#PasswordWarning').hide();
+                }
+                else
+                {
+                    console.log('show');
+                    $('#PasswordWarning').show();
+                }
             });
             
             
@@ -41,9 +62,107 @@
     <div class="modal" style="display: none;">
         <div class="container">
             <div class="row">
-                <div class="col-sm-12 modal-tile" style="width:500px; height:150px; display: none;" id="ModifyUserModal">
-                    <h1>Modify User</h1>
-                    <input type="button" class="btn btn-sm btn-primary close-modal" value="Cancel"/>
+                <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyUserModal">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1>Modify User</h1>
+                        </div>
+                    </div>
+                    <hr>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <label for="UserIDInput">User ID:</label>
+                            <input type="text" class="form-control" id="UserIDInput" readonly/>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="UsernameInput">Username:</label>
+                            <input type="text" class="form-control" id="UsernameInput" readonly/>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="FullNameInput">Display Name:</label>
+                            <input type="text" class="form-control" id="FullNameInput" placeholder="Full Name"/>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="AddUserRoleInput">Add User Role:</label>
+                            <div class="row">
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="AddUserRoleInput">
+                                        <option th:each="role : ${roles_list}" th:text="${role.getName()}">role</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="button" class="btn btn-md btn-primary btn-block addUserRoleButton" value="Add"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="UserEmailInput">Email Address:</label>
+                            <input type="text" class="form-control" id="UserEmailInput" placeholder="example@demo.com"/>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label>User Role(s):</label>
+                            <div class="role-container">
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" value="ADMIN" readonly/>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" value="ADMIN" readonly/>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" value="ADMIN" readonly/>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label for="ChangeUserPassword">Change Password:</label>
+                                    <input type="password" class="form-control user-password" id="ChangeUserPassword"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="ConfirmUserPassword">Confirm Password:</label>
+                                    <input type="password" class="form-control user-password" id="ConfirmUserPassword"/>
+                                </div>
+                                <div class="col-sm-12 alert alert-danger" id="PasswordWarning" style="display: none;">
+                                    Passwords do not match.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <input type="button" class="btn btn-md btn-primary saveUserButton" style="float:right; padding-right: 10px;" value="Save Changes"/>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -76,12 +195,13 @@
         </div>
         <div class="row">
             <div class="col-sm-12 panel">
-                <div class="col-sm-6 inset-panel">
+                <div class="col-sm-12 inset-panel">
                     <center><h3>System Users</h3></center>
                     <br>
-                    <table id="UserTable">
+                    <table id="UserTable" class="display">
                         <thead>
                             <tr>
+                                <th>User ID</th>
                                 <th>Username</th>
                                 <th>Display Name</th>
                                 <th>System Role</th>
@@ -89,10 +209,35 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr th:each="user : ${users_list}">
+                                <td th:text="${user.getId()}" class="userId">-1</td>
+                                <td th:text="${user.getUsername()}" class="username">No Name</td>
+                                <td th:text="${user.getFullName()}" class="fullName">test_user</td>
+                                <td><p th:text="${user.getRoleNames()}" class="roleNames">user</td>
+                                <td><p class="view-a userModifyButton">Modify</p></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-12 inset-panel">
+                    <center><h3>System Users</h3></center>
+                    <br>
+                    <table id="UserTable" class="display">
+                        <thead>
                             <tr>
-                                <td>admin</td>
-                                <td>System Administrator</td>
-                                <td>ADMIN</td>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>Display Name</th>
+                                <th>System Role</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users_list}">
+                                <td th:text="${user.getId()}">-1</td>
+                                <td th:text="${user.getUsername()}">No Name</td>
+                                <td th:text="${user.getFullName()}">test_user</td>
+                                <td><p th:text="${user.getRoleNames()}">user</td>
                                 <td><p class="view-a userModifyButton">Modify</p></td>
                             </tr>
                         </tbody>

@@ -11,11 +11,12 @@ public class User {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long user_id;
  
     private String username;
     private String password;
     private boolean enabled;
+    private String full_name;
      
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -26,7 +27,7 @@ public class User {
     private Set<Role> roles = new HashSet<>();
  
     public Long getId() {
-        return id;
+        return user_id;
     }
 
     public String getUsername(){
@@ -55,6 +56,23 @@ public class User {
 
     public Set<Role> getRoles() {
       return this.roles;
+    }
+
+    public String getRoleNames() {
+      String roleNames = "";
+      Set<Role> roleSet = this.getRoles();
+      for (Role name : roleSet)
+      {
+        if(roleNames.length() > 0)
+          roleNames += ("\n" + name.getName());
+        else
+          roleNames += name.getName(); 
+      }
+      return roleNames;
+    }
+
+    public String getFullName() {
+      return this.full_name;
     }
  
     // remaining getters and setters are not shown for brevity
