@@ -14,17 +14,89 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script>
         $(document).ready(function(){            
+
+            var roleRowIndex = 0;
+
+            function addUserRole(id, name)
+            {
+                var alreadyExists = false;
+                $('.user-role-id').each(function(key, val){
+                    console.log($(val).val() == id);
+                    if($(val).val() == id)
+                    {
+                        alreadyExists = true;
+                    }
+                });
+                
+                if(alreadyExists)       //  If the role already exists, don't add a new one.
+                    return;
+
+                var html = '';
+                html += '<div class="col-sm-7 user-role-div" style="margin-bottom:20px;">';
+                html +=     '<div class="row">';
+                html +=         '<div class="col-sm-6">';
+                html +=             '<input type="hidden" class="form-control user-role-id" name="users_roles[' + roleRowIndex + '].role_id" value="' + id + '" readonly/>';
+                html +=             '<input type="text" class="form-control" value="' + name + '" readonly/>';
+                html +=         '</div>';
+                html +=         '<div class="col-sm-3">';
+                html +=             '<input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>';
+                html +=         '</div>';
+                html +=     '</div>';
+                html += '</div>';
+                
+                $('.modal .role-row').append(html);
+                $('.removeUserRoleButton').show();
+                roleRowIndex++;
+            }
+
             $('body').on('click', '.userModifyButton', function(){
                 $('.modal-tile').hide();
                 $('.modal, #ModifyUserModal').show();
                 $("body").toggleClass("dialogIsOpen");
 
                 var userRow = $(this).parents('tr');
-                
 
+                $('#HeadingUser').html($(userRow).find('.username').html());
                 $('#UserIDInput').val($(userRow).find('.userId').html());
                 $('#UsernameInput').val($(userRow).find('.username').html());
                 $('#FullNameInput').val($(userRow).find('.fullName').html());
+                $('#UserEmailInput').val($(userRow).find('.email').html());
+
+                if($(userRow).data('enabled') == 1)
+                    $('#UserEnabled').attr('checked', true);
+                else
+                    $('#UserEnabled').attr('checked', false);
+
+                roleRowIndex = 0;
+                $('.modal .role-row').html('');
+                $(userRow).find('.userroles').find('p').each(function(key, val){
+                    addUserRole($(val).data('id'), $(val).data('name'));
+                });
+                if($('.modal .role-row').children().length <= 1)
+                {
+                    if($('.modal .role-row').children().length == 0)
+                    {
+                        addUserRole(2, "User");         //  If removed all roles, add default user role.
+                    }
+                    $('.removeUserRoleButton').hide();
+                }
+            });
+
+            $('body').on('click', '.removeUserRoleButton', function(){
+                $(this).parents('.user-role-div').remove();
+                roleRowIndex--;
+                if($('.modal .role-row').children().length <= 1)
+                {
+                    if($('.modal .role-row').children().length == 0)
+                    {
+                        addUserRole(2, "User");         //  If removed all roles, add default user role.
+                    }
+                    $('.removeUserRoleButton').hide();
+                }
+            });
+
+            $('body').on('click', '.addUserRoleButton', function(){
+                addUserRole($('#AddUserRoleInput').val(), $('#AddUserRoleInput option:selected').text())
             });
 
             $(document).on('click','.close-modal', function(){
@@ -36,16 +108,20 @@
                 console.log('change');
                 if($('#ChangeUserPassword').val() == $('#ConfirmUserPassword').val())
                 {
-                    console.log('hide');
                     $('#PasswordWarning').hide();
                 }
                 else
                 {
-                    console.log('show');
                     $('#PasswordWarning').show();
                 }
             });
             
+            $('body').on('click', '.saveUserButton', function(event){
+                if($('#ChangeUserPassword').val() != $('#ConfirmUserPassword').val())
+                {
+                    event.preventDefault();
+                }
+            });
             
             
             $('#UserTable').dataTable({
@@ -59,134 +135,130 @@
     </script>
 </head>
 <body>
+<div style="padding-left: calc(100vw - 100%);">
     <div class="modal" style="display: none;">
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyUserModal">
                     <div class="row">
                         <div class="col-sm-12">
-                            <h1>Modify User</h1>
+                            <h1>Modify User<p id="HeadingUser" style="float:right;">Admin</p></h1>
                         </div>
                     </div>
                     <hr>
                     <br>
-                    <div class="row">
-                        <div class="col-sm-2">
-                            <label for="UserIDInput">User ID:</label>
-                            <input type="text" class="form-control" id="UserIDInput" readonly/>
-                        </div>
-                        <div class="col-sm-4">
-                            <label for="UsernameInput">Username:</label>
-                            <input type="text" class="form-control" id="UsernameInput" readonly/>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="FullNameInput">Display Name:</label>
-                            <input type="text" class="form-control" id="FullNameInput" placeholder="Full Name"/>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <label for="AddUserRoleInput">Add User Role:</label>
-                            <div class="row">
-                                <div class="col-sm-9">
-                                    <select class="form-control" id="AddUserRoleInput">
-                                        <option th:each="role : ${roles_list}" th:text="${role.getName()}">role</option>
-                                    </select>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input type="button" class="btn btn-md btn-primary btn-block addUserRoleButton" value="Add"/>
-                                </div>
+                    <form action="#" th:action="@{/admin/updateUser}" method="post">
+                        <div class="row">
+                            <div class="col-sm-1">
+                                <label for="UserIDInput">ID:</label>
+                                <input type="text" class="form-control" id="UserIDInput" th:field="${user.user_id}" readonly/>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="UsernameInput">Username:</label>
+                                <input type="text" class="form-control" id="UsernameInput" th:field="${user.username}" readonly/>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="FullNameInput">Display Name:</label>
+                                <input type="text" class="form-control" id="FullNameInput" th:field="${user.full_name}" placeholder="Full Name"/>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="UserEmailInput">Email Address:</label>
+                                <input type="text" class="form-control" id="UserEmailInput" th:field="${user.email}" placeholder="example@demo.com"/>
+                            </div>
+                            <div class="col-sm-1">
+                                <label for="FullNameInput">Enabled:</label>
+                                <input type="checkbox" class="form-control" id="UserEnabled" th:field="${user.enabled}">
                             </div>
                         </div>
-                        <div class="col-sm-6">
-                            <label for="UserEmailInput">Email Address:</label>
-                            <input type="text" class="form-control" id="UserEmailInput" placeholder="example@demo.com"/>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <label>User Role(s):</label>
-                            <div class="role-container">
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <label for="AddUserRoleInput">Add User Role:</label>
                                 <div class="row">
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" value="ADMIN" readonly/>
+                                        <select class="form-control" id="AddUserRoleInput">
+                                            <option th:each="role : ${roles_list}" th:text="${role.getName()}" th:value="${role.getRole_id()}">role</option>
+                                        </select>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                        <input type="button" class="btn btn-md btn-success btn-block addUserRoleButton" value="Add"/>
                                     </div>
                                 </div>
-                                <br>
+                            </div>
+                            <div class="col-sm-7">
                                 <div class="row">
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" value="ADMIN" readonly/>
+                                    <div class="col-sm-6">
+                                        <label for="ChangeUserPassword">Change Password:</label>
+                                        <input type="password" class="form-control user-password" id="ChangeUserPassword" th:field="${user.password}"/>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                    <div class="col-sm-6">
+                                        <label for="ConfirmUserPassword">Confirm Password:</label>
+                                        <input type="password" class="form-control user-password" id="ConfirmUserPassword"/>
                                     </div>
-                                </div>
-                                <br>
-                                <div class="row">
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" value="ADMIN" readonly/>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                    <div class="col-sm-12 alert alert-danger" id="PasswordWarning" style="display: none;">
+                                        Passwords do not match.
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <label for="ChangeUserPassword">Change Password:</label>
-                                    <input type="password" class="form-control user-password" id="ChangeUserPassword"/>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label for="ConfirmUserPassword">Confirm Password:</label>
-                                    <input type="password" class="form-control user-password" id="ConfirmUserPassword"/>
-                                </div>
-                                <div class="col-sm-12 alert alert-danger" id="PasswordWarning" style="display: none;">
-                                    Passwords do not match.
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label>User Roles:</label>
+                                <div class="row role-row">
+                                    <div class="col-sm-7">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" readonly/>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="button" class="btn btn-md btn-danger btn-block removeUserRoleButton" value="Remove"/>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-sm-10">
-                            <input type="button" class="btn btn-md btn-primary saveUserButton" style="float:right; padding-right: 10px;" value="Save Changes"/>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="submit" class="btn btn-md btn-primary saveUserButton" style="float:right; padding-right: 10px;" value="Save Changes"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
+                            </div>
                         </div>
-                        <div class="col-sm-2">
-                            <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
-                        </div>
-                    </div>
-
+                    </form>
                 </div>
             </div>
         </div>
     </div>
     <div class="container" id="ContentWrapper">
-        <div class="row">
+        <div class="row"> <!--      NAVBAR      -->
             <div class="col-sm-12 sn-navbar">
                 <div class="sn-navbar-btn" onclick="window.location='/home'">
                     Home
                 </div>
-                <div sec:authorize="hasAuthority('ADMIN')" class="sn-navbar-btn" onclick="window.location='/admin'">
-                    Admin Dashboard
+                <div sec:authorize="hasAuthority('ADMIN')" class="sn-navbar-btn" onclick="window.location='/admin/dashboard'">
+                    Admin
                 </div>
                 <div sec:authorize="hasAnyAuthority('ADMIN', 'REFERRAL_DOCTOR')" class="sn-navbar-btn" onclick="window.location='/referral'">
                     Referrals
                 </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')" class="sn-navbar-btn" onclick="window.location='/appointments'">
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')" class="sn-navbar-btn" onclick="window.location='/staff/appointments'">
                     Appointments
                 </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'TECHNICIAN')" class="sn-navbar-btn" onclick="window.location='/imaging'">
-                    Imaging
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')" class="sn-navbar-btn" onclick="window.location='/staff/orders'">
+                    Orders
                 </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/analysis'">
-                    Radiology Analysis
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'TECHNICIAN')" class="sn-navbar-btn" onclick="window.location='/imaging/appointments'">
+                    Appointments
+                </div>
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/diagnostics/appointments'">
+                    Appointments
+                </div>
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/diagnostics/appointments'">
+                    Orders
                 </div>
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
                     Logout
@@ -204,47 +276,29 @@
                                 <th>User ID</th>
                                 <th>Username</th>
                                 <th>Display Name</th>
+                                <th>Email Address</th>
                                 <th>System Role</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="user : ${users_list}">
-                                <td th:text="${user.getId()}" class="userId">-1</td>
+                            <tr th:each="user : ${users_list}" th:attr="data-enabled=${user.getEnabled()}">
+                                <td th:text="${user.getUser_id()}" class="userId">-1</td>
                                 <td th:text="${user.getUsername()}" class="username">No Name</td>
-                                <td th:text="${user.getFullName()}" class="fullName">test_user</td>
-                                <td><p th:text="${user.getRoleNames()}" class="roleNames">user</td>
+                                <td th:text="${user.getFull_name()}" class="fullName">test_user</td>
+                                <td th:text="${user.getEmail()}" class="email">@demo.com</td>
+                                <td class="userroles"><p style="margin: 0;" th:each="role, stats : ${user.getRoles()}" th:text="${role.name}" th:attr="data-id=${role.role_id}, data-name=${role.name}"></p></td>
                                 <td><p class="view-a userModifyButton">Modify</p></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="col-sm-12 inset-panel">
-                    <center><h3>System Users</h3></center>
-                    <br>
-                    <table id="UserTable" class="display">
-                        <thead>
-                            <tr>
-                                <th>User ID</th>
-                                <th>Username</th>
-                                <th>Display Name</th>
-                                <th>System Role</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="user : ${users_list}">
-                                <td th:text="${user.getId()}">-1</td>
-                                <td th:text="${user.getUsername()}">No Name</td>
-                                <td th:text="${user.getFullName()}">test_user</td>
-                                <td><p th:text="${user.getRoleNames()}">user</td>
-                                <td><p class="view-a userModifyButton">Modify</p></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <center><h3>Patients</h3></center>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>

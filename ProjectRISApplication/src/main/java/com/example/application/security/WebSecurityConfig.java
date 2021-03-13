@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -44,7 +43,7 @@ class LoginRedirectSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests()
             .antMatchers("/css/**", "/images/**").permitAll()
-            .antMatchers("/admin").hasAnyAuthority("ADMIN")
+            .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
             .antMatchers("/home").hasAnyAuthority("ADMIN", "USER", "REFERRAL_DOCTOR",  "RECEPTIONIST", "TECHNICIAN", "RADIOLOGIST")
             .anyRequest().authenticated()
             
@@ -55,20 +54,5 @@ class LoginRedirectSecurityConfig extends WebSecurityConfigurerAdapter {
             .and().logout().logoutUrl("/user_logout").logoutSuccessUrl("/login").deleteCookies("JSESSIONID")
             .and().exceptionHandling().accessDeniedPage("/403")
             .and().csrf().disable();
-/*
-        http
-          .addFilterAfter(new LoginPageFilter(), UsernamePasswordAuthenticationFilter.class)
-
-          .authorizeRequests()
-          .antMatchers("/login").permitAll()
-          .antMatchers("/home*").hasRole("ADMIN")
-
-          .and().formLogin().loginPage("/login").loginProcessingUrl("/user_login")
-          .failureUrl("/login?error=loginError").defaultSuccessUrl("/home").permitAll()
-
-          .and().logout().logoutUrl("/user_logout").logoutSuccessUrl("/login").deleteCookies("JSESSIONID")
-          .and().exceptionHandling().accessDeniedPage("/403")
-          .and().csrf().disable();
-          */
     }
 }

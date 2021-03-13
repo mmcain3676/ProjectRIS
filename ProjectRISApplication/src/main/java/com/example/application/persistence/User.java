@@ -17,6 +17,7 @@ public class User {
     private String password;
     private boolean enabled;
     private String full_name;
+    private String email;
      
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -26,8 +27,8 @@ public class User {
             )
     private Set<Role> roles = new HashSet<>();
  
-    public Long getId() {
-        return user_id;
+    public Long getUser_id() {
+        return this.user_id;
     }
 
     public String getUsername(){
@@ -38,8 +39,21 @@ public class User {
       return this.password;
     }
 
-    public boolean isEnabled(){
+    public String getFull_name() {
+      return this.full_name;
+    }
+
+    public String getEmail() {
+      return this.email;
+    }
+
+    public boolean getEnabled(){
       return this.enabled;
+    }
+
+
+    public void setUser_id(Long id){
+      this.user_id = id;
     }
 
     public void setUsername(String username){
@@ -48,6 +62,14 @@ public class User {
 
     public void setPassword(String password){
       this.password = password;
+    }
+
+    public void setFull_name(String name){
+      this.full_name = name;
+    }
+
+    public void setEmail(String email) {
+      this.email = email;
     }
 
     public void setEnabled(boolean enabled){
@@ -69,10 +91,6 @@ public class User {
           roleNames += name.getName(); 
       }
       return roleNames;
-    }
-
-    public String getFullName() {
-      return this.full_name;
     }
  
     // remaining getters and setters are not shown for brevity

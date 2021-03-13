@@ -1,32 +1,18 @@
 package com.example.application.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
-import java.util.Enumeration;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.example.application.persistence.User;
-import com.example.application.repositories.UserRepository;
 
 @Controller 
 //@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class UserController {
-    @Autowired 
-    private UserRepository userRepository;
 
     @GetMapping("/home")
     public String homeView(HttpSession session, Model model)
