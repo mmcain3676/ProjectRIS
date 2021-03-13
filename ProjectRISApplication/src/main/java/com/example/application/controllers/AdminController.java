@@ -85,7 +85,7 @@ public class AdminController {
             role.setUserid(user.getUser_id());
             usersRolesReposity.save(role);      //Save lise of roles
         }
-
+ 
         return "redirect:dashboard";
     }
 }
