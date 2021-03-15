@@ -3,9 +3,10 @@
 <head> 
     <title>User Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    
     
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
@@ -49,12 +50,24 @@
                 roleRowIndex++;
             }
 
+            function userWarning(warning)
+            {
+                $('#UserWarning').show();
+                $('#UserWarningContent').html(warning);
+            }
+
             $('body').on('click', '.userModifyButton', function(){
-                $('.modal-tile').hide();
+                $('.modal-tile, #UserWarning').hide();
                 $('.modal, #ModifyUserModal').show();
                 $("body").toggleClass("dialogIsOpen");
 
                 var userRow = $(this).parents('tr');
+                
+
+                $('.form-control[type="text"]').val('');
+
+                $('#UserModalTitle').html('Modify User');
+                $('#UsernameInput').attr('readonly', true);
 
                 $('#HeadingUser').html($(userRow).find('.username').html());
                 $('#UserIDInput').val($(userRow).find('.userId').html());
@@ -82,6 +95,22 @@
                 }
             });
 
+            $('body').on('click', '.userCreateButton', function(){
+                $('.modal-tile, #UserWarning').hide();
+                $('.modal, #ModifyUserModal').show();
+                $("body").toggleClass("dialogIsOpen");
+
+                $('#HeadingUser').html('New User');
+                $('#UserModalTitle').html('Create New User');
+                $('#UsernameInput').attr('readonly', false);
+
+                $('.form-control[type="text"]').val('');
+
+                $('.modal .role-row').html('');
+                addUserRole(2, "User");
+                $('.removeUserRoleButton').hide();
+            });
+
             $('body').on('click', '.removeUserRoleButton', function(){
                 $(this).parents('.user-role-div').remove();
                 roleRowIndex--;
@@ -100,12 +129,12 @@
             });
 
             $(document).on('click','.close-modal', function(){
-                $('.modal-tile').hide();
+                $('.modal-tile, #PasswordWarning, #UserWarning').hide();
                 $("body").toggleClass("dialogIsOpen");
+                $('.user-password').val('');
             });
 
             $('.user-password').on('keyup', function(){
-                console.log('change');
                 if($('#ChangeUserPassword').val() == $('#ConfirmUserPassword').val())
                 {
                     $('#PasswordWarning').hide();
@@ -117,9 +146,32 @@
             });
             
             $('body').on('click', '.saveUserButton', function(event){
-                if($('#ChangeUserPassword').val() != $('#ConfirmUserPassword').val())
+                $('#UserWarning').hide();
+                if($('#UserIDInput').val().length > 0)
                 {
-                    event.preventDefault();
+                    if($('#ChangeUserPassword').val() != $('#ConfirmUserPassword').val())
+                    {
+                        userWarning("Passwords must match");
+                        event.preventDefault();
+                    }
+                }
+                else
+                {
+                    if($('#ChangeUserPassword').val() != $('#ConfirmUserPassword').val())
+                    {
+                        userWarning("Passwords must match");
+                        event.preventDefault();
+                    }
+                    if($('#ChangeUserPassword').val().length <= 0)
+                    {
+                        userWarning("Password cannot be empty");
+                        event.preventDefault();
+                    }
+                    if($('#UsernameInput').val().length <= 0)
+                    {
+                        userWarning("Username cannot be empty");
+                        event.preventDefault();
+                    }
                 }
             });
             
@@ -142,10 +194,14 @@
                 <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyUserModal">
                     <div class="row">
                         <div class="col-sm-12">
-                            <h1>Modify User<p id="HeadingUser" style="float:right;">Admin</p></h1>
+                            <h1 id="UserModalTitle">Modify User<p id="HeadingUser" style="float:right;">Admin</p></h1>
                         </div>
                     </div>
                     <hr>
+                    <div class="row" id="UserWarning" style="display: none; font-weight: bold;">
+                        <div class="col-sm-12 alert alert-danger" id="UserWarningContent">
+                        </div>
+                    </div>
                     <br>
                     <form action="#" th:action="@{/admin/updateUser}" method="post">
                         <div class="row">
@@ -267,8 +323,16 @@
         </div>
         <div class="row">
             <div class="col-sm-12 panel">
-                <div class="col-sm-12 inset-panel">
-                    <center><h3>System Users</h3></center>
+                <div class="inset-panel">
+                    <div class="row">
+                        <div class="col-sm-4"><p></p></div>
+                        <div class="col-sm-4">
+                            <center><h3>System Users</h3></center>
+                        </div>
+                        <div class="col-sm-4">
+                            <p class="view-a userCreateButton" style="font-size: 24px; float:right;">New</p>
+                        </div>
+                    </div>
                     <br>
                     <table id="UserTable" class="display">
                         <thead>
@@ -293,7 +357,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-sm-12 inset-panel">
+                <div class="inset-panel">
                     <center><h3>Patients</h3></center>
                 </div>
             </div>

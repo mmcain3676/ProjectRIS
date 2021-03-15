@@ -100,3 +100,9 @@ body {
 label {
     font-weight: bold;
 }
+
+div.pad-input {
+    margin-bottom: 20px;
+}
+
+.ui-datepicker{z-index: 2000!important}

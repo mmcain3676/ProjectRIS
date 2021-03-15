@@ -50,7 +50,6 @@ class LoginRedirectSecurityConfig extends WebSecurityConfigurerAdapter {
             .and().formLogin().loginPage("/login").loginProcessingUrl("/user_login")
             .failureUrl("/login?error=loginError").defaultSuccessUrl("/home").permitAll()
             
-            
             .and().logout().logoutUrl("/user_logout").logoutSuccessUrl("/login").deleteCookies("JSESSIONID")
             .and().exceptionHandling().accessDeniedPage("/403")
             .and().csrf().disable();

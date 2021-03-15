@@ -23,7 +23,7 @@ import com.example.application.repositories.UserRepository;
 import com.example.application.repositories.UsersRolesRepository;
 
 @Controller 
-@RequestMapping(path="/admin") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="/admin") // This means URL's start with /admin (after Application path)
 public class AdminController {
     @Autowired 
     private UserRepository userRepository;
@@ -50,40 +50,51 @@ public class AdminController {
     @PostMapping("/updateUser")
     public String updateUser(@ModelAttribute("user") User user, @ModelAttribute("roles") UsersRolesList users_roles, Model model, BindingResult result)
     {
-        Optional<User> find_user = userRepository.findById(user.getUser_id());
-        if(find_user.isPresent())       //Find current user
+
+        if(user.getUser_id() == null)       //  Create new user if user_id == null
         {
-            if(user.getPassword().isEmpty())        //See if we are changing the password
+            userRepository.save(user);
+        } 
+        else                                //  Update use on user_id
+        {
+            Optional<User> find_user = userRepository.findById(user.getUser_id());
+            if(find_user.isPresent())       //Find current user
             {
-                user.setPassword(find_user.get().getPassword());       //If not, use old password
+                if(user.getPassword().isEmpty())        //See if we are changing the password
+                {
+                    user.setPassword(find_user.get().getPassword());       //If not, use old password
+                }
+                else
+                {
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));       //If so, encode new password
+                }
             }
-            else
+    
+    
+            usersRolesReposity.deleteByUserid(user.getUser_id());       //Delete old user roles
+    
+            userRepository.save(user);      //Save user first
+    
+
+            if(users_roles.getUsers_roles() == null)      // If no role is passed, create a default user (2) role
             {
-                user.setPassword(passwordEncoder.encode(user.getPassword()));       //If so, encode new password
+                System.out.println("No role, adding user");
+                UsersRoles default_user = new UsersRoles();
+                default_user.setUserid(user.getUser_id());
+                default_user.setRole_id(Long.valueOf(2));
+                ArrayList<UsersRoles> usersRoleList = new ArrayList<UsersRoles>();
+                users_roles.setUsers_roles(usersRoleList);
             }
-        }
-
-
-        usersRolesReposity.deleteByUserid(user.getUser_id());       //Delete old user roles
-
-        userRepository.save(user);      //Save user first
-
-        if(users_roles.getUsers_roles() == null)      // If no role is passed, create a default user (2) role
-        {
-            UsersRoles default_user = new UsersRoles();
-            default_user.setUserid(user.getUser_id());
-            default_user.setRole_id(Long.valueOf(2));
-            ArrayList<UsersRoles> usersRoleList = new ArrayList<UsersRoles>();
-            users_roles.setUsers_roles(usersRoleList);
-        }
-
-
-        for(UsersRoles role : users_roles.getUsers_roles())
-        {
-            if(role.getRole_id() == null)
-                role.setRole_id(Long.valueOf(2));   //If the role doesn't exist, just set it to the default user (2)
-            role.setUserid(user.getUser_id());
-            usersRolesReposity.save(role);      //Save lise of roles
+    
+    
+            for(UsersRoles role : users_roles.getUsers_roles())
+            {
+                if(role.getRole_id() != null)
+                {
+                    role.setUserid(user.getUser_id());
+                    usersRolesReposity.save(role);      //Save lise of roles
+                }
+            }
         }
  
         return "redirect:dashboard";
