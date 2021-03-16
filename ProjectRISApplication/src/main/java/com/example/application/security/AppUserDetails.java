@@ -10,6 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
  
 public class AppUserDetails implements UserDetails {
  
+
+    public Long getUserId(){
+        return user.getUser_id();
+    }
     /**
      *
      */

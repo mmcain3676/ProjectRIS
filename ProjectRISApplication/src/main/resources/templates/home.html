@@ -48,20 +48,26 @@
         </div>
         <div class="row">
             <div class="col-sm-12 panel">
-                <center>
-                    <h1>Logged in</h1>
-
-                    <div sec:authorize="isAuthenticated()">
-                        <p>Welcome <b><span sec:authentication="name">Username</span></b></p>
-                        <p><i><span sec:authentication="principal.authorities">Roles</span></i></p>
+                <div class="inset-panel">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <center>
+                                <h1>Logged in</h1>
+            
+                                <div sec:authorize="isAuthenticated()">
+                                    <p>Welcome <b><span sec:authentication="name">Username</span></b></p>
+                                    <p><i><span sec:authentication="principal.authorities">Roles</span></i></p>
+                                </div>
+            
+                                <div sec:authorize="hasAuthority('USER')">
+                                    <p><b>Contact your system admin to be assigned a system role.</b></p>
+                                </div>
+                                
+                                <input type="button" class="btn btn-md btn-primary" value="Logout" onclick="window.location='/user_logout'"/>
+                            </center>
+                        </div>
                     </div>
-
-                    <div sec:authorize="hasAuthority('USER')">
-                        <p><b>Contact your system admin to be assigned a system role.</b></p>
-                    </div>
-                    
-                    <input type="button" class="btn btn-md btn-primary" value="Logout" onclick="window.location='/user_logout'"/>
-                </center>
+                </div>
             </div>
         </div>
     </div>

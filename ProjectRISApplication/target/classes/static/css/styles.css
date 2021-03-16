@@ -43,6 +43,7 @@ body {
     border-width: 2px;
     border-style: solid;
     padding: 20px;
+    padding-bottom: 0px;
 }
 
 .inset-panel {
@@ -51,6 +52,7 @@ body {
     border-width: 2px;
     border-style: solid;
     padding: 20px;
+    margin-bottom: 20px;
 }
 
 .sn-navbar {

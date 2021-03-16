@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import com.example.application.persistence.User;
 import com.example.application.persistence.UsersRoles;
 import com.example.application.persistence.UsersRolesList;
+import com.example.application.repositories.OrderRepository;
+import com.example.application.repositories.PatientRepository;
 import com.example.application.repositories.RoleRepository;
 import com.example.application.repositories.UserRepository;
 import com.example.application.repositories.UsersRolesRepository;
@@ -30,7 +32,11 @@ public class AdminController {
     @Autowired 
     private RoleRepository roleRepository;
     @Autowired
-    private UsersRolesRepository usersRolesReposity;
+    private UsersRolesRepository usersRolesRepository;
+    @Autowired
+    private PatientRepository patientRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -43,6 +49,9 @@ public class AdminController {
         model.addAttribute("roles", rolesList);
         model.addAttribute("users_list", userRepository.findAll());
         model.addAttribute("roles_list", roleRepository.findAll());
+        model.addAttribute("patients_list", patientRepository.findAll());
+        model.addAttribute("orders_list", orderRepository.findAll());
+        System.out.println(orderRepository.findAll());
         model.addAttribute("user", new User());
         return "admin_dashboard";
     }
@@ -71,7 +80,7 @@ public class AdminController {
             }
     
     
-            usersRolesReposity.deleteByUserid(user.getUser_id());       //Delete old user roles
+            usersRolesRepository.deleteByUserid(user.getUser_id());       //Delete old user roles
     
             userRepository.save(user);      //Save user first
     
@@ -92,7 +101,7 @@ public class AdminController {
                 if(role.getRole_id() != null)
                 {
                     role.setUserid(user.getUser_id());
-                    usersRolesReposity.save(role);      //Save lise of roles
+                    usersRolesRepository.save(role);      //Save lise of roles
                 }
             }
         }
