@@ -1,15 +1,9 @@
-package com.example.application.persistence;
-import javax.persistence.*;
+package com.example.application.dto;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
- 
-@Entity
-@Table(name = "orders")
-public class Order {
-    @Id
-    @Column(name = "order_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+import com.example.application.persistence.Patient;
+import com.example.application.persistence.User;
+
+public class OrderDTO {
     private Long id;
 
     private Long patient;
@@ -19,11 +13,27 @@ public class Order {
     private Long status;
     private Long report;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
-    @Fetch(FetchMode.JOIN)
     private Patient patientObject;
+    private User referral_mdObject;
     
+
+    public OrderDTO(
+        Long id,
+        Patient patientObject,
+        User referral_mdObject,
+        Long modality,
+        String notes,
+        Long status,
+        Long report)
+    {
+        this.id = id;
+        this.patientObject = patientObject;
+        this.referral_mdObject = referral_mdObject;
+        this.modality = modality;
+        this.notes = notes;
+        this.status = status;
+        this.report = report;
+    }
 
 
     //      GETTERS
@@ -56,8 +66,12 @@ public class Order {
         return this.report;
     }
 
-    public Patient getPatientobject(){
+    public Patient getPatientObject(){
         return this.patientObject;
+    }
+
+    public User getReferral_mdObject(){
+        return this.referral_mdObject;
     }
 
 
@@ -91,12 +105,11 @@ public class Order {
         this.report = report;
     }
 
-    public void setPatientobject(Patient patientObject){
+    public void setPatientObject(Patient patientObject){
         this.patientObject = patientObject;
     }
 
-    
-
-
-
+    public void setReferral_mdObject(User referral_mdObject){
+        this.referral_mdObject = referral_mdObject;
+    }
 }

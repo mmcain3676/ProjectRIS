@@ -79,15 +79,10 @@ public class ReferralMDController {
     @PostMapping("/updateOrder")
     public String updateOrder(@ModelAttribute("order") Order order, Model model, BindingResult result)
     {
-        
-        System.out.println("P " + order.getPatient());
-        System.out.println("MD " + order.getReferral_md());
-        System.out.println(order.getModality());
-        System.out.println(order.getNotes());
 
         orderRepository.save(order);
         
 
-        return "redirect:/referral";
+        return "redirect:/home";
     }
 }

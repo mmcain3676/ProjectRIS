@@ -51,7 +51,6 @@ public class AdminController {
         model.addAttribute("roles_list", roleRepository.findAll());
         model.addAttribute("patients_list", patientRepository.findAll());
         model.addAttribute("orders_list", orderRepository.findAll());
-        System.out.println(orderRepository.findAll());
         model.addAttribute("user", new User());
         return "admin_dashboard";
     }
