@@ -1,5 +1,4 @@
 package com.example.application.persistence;
-import java.util.Set;
 
 import javax.persistence.*;
  
@@ -17,9 +16,6 @@ public class Patient {
     private String sex;
     private String race;
     private String ethnicity;
-
-    @OneToMany(targetEntity = Order.class, mappedBy = "id", orphanRemoval = false, fetch = FetchType.LAZY)
-    private Set<Order> orders;
 
     public Long getId() {
         return this.id;
@@ -47,10 +43,6 @@ public class Patient {
 
     public String getEthnicity(){
         return this.ethnicity;
-    }
-
-    public Set<Order> getOrders(){
-        return this.orders;
     }
 
 
@@ -82,10 +74,6 @@ public class Patient {
 
     public void setEthnicity(String ethnicity){
         this.ethnicity = ethnicity;
-    }
-
-    public void setOrders(Set<Order> orders){
-        this.orders = orders;
     }
 
 

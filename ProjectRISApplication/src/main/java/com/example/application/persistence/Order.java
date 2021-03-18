@@ -1,8 +1,5 @@
 package com.example.application.persistence;
 import javax.persistence.*;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
  
 @Entity
 @Table(name = "orders")
@@ -18,11 +15,6 @@ public class Order {
     private String notes;
     private Long status;
     private Long report;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
-    @Fetch(FetchMode.JOIN)
-    private Patient patientObject;
     
 
 
@@ -56,10 +48,6 @@ public class Order {
         return this.report;
     }
 
-    public Patient getPatientobject(){
-        return this.patientObject;
-    }
-
 
     //      SETTERS
 
@@ -89,10 +77,6 @@ public class Order {
 
     public void setReport(Long report){
         this.report = report;
-    }
-
-    public void setPatientobject(Patient patientObject){
-        this.patientObject = patientObject;
     }
 
     
