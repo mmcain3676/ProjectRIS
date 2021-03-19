@@ -15,6 +15,18 @@ public class Appointment {
     private String datetime;
     private Long radiologist;
     private Long technician;
+    @Column(name = "phone_number")
+    private String phonenumber;
+    @Column(name = "email_address")
+    private String emailaddress;
+
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    public Long getId(){
+        return this.id;
+    }
 
     public void setPatient(Long patient) {
         this.patient = patient;
@@ -52,8 +64,24 @@ public class Appointment {
         this.technician = technician;
     }
 
-    public Long getTechnicain() {
+    public Long getTechnician() {
         return this.technician;
+    }
+
+    public void setPhonenumber(String phonenumber){
+        this.phonenumber = phonenumber;
+    }
+
+    public String getPhonenumber(){
+        return this.phonenumber;
+    }
+
+    public void setEmailaddress(String emailaddress){
+        this.emailaddress = emailaddress;
+    }
+
+    public String getEmailaddress(){
+        return this.emailaddress;
     }
 
 }

@@ -4,6 +4,8 @@
     <title>User Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     
@@ -13,6 +15,26 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script>
         $(document).ready(function(){
+            
+            $('body').on('click', '.orderModifyButton', function(){
+                $('.modal-tile').hide();
+                $('.modal, #ModifyAppointmentModal').show();
+                $("body").toggleClass("dialogIsOpen");
+
+                var orderRow = $(this).parents('tr');
+
+                $('#PatientFirstNameInput').val(orderRow.data('first_name'));
+                $('#PatientLastNameInput').val(orderRow.data('last_name'));
+                $('#PatientDOBInput').val(orderRow.data('dob'));
+                $('#AppointmentPatientInput').val(orderRow.data('patient'));
+            });
+
+            $(document).on('click','.close-modal', function(){
+                $('.modal-tile').hide();
+                $("body").toggleClass("dialogIsOpen");
+
+                $('input[id$="Input"]').val('');
+            });
             
             $('#OrderTable').dataTable({
                 "bPaginate": false,
@@ -24,11 +46,104 @@
                      "targets" : [0, 5, 6]}
                 ]}
             );
+            
+            $('#AppointmentDateTimeInput').datepicker({
+                changeMonth: true, 
+                changeYear: true, 
+                dateFormat: 'yy-mm-dd',
+                container: '#ModifyPatientModal'
+            });
         });
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="modal" style="display: none;">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyAppointmentModal">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 id="AppointmentModalTitle">Schedule Appointment</h1>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="AppointmentWarning" style="display: none; font-weight: bold;">
+                        <div class="col-sm-12 alert alert-danger" id="AppointmentWarningContent">
+                        </div>
+                    </div>
+                    <br>
+                    <form action="#" th:action="@{/staff/updateAppointment}" method="post">
+                        <input type="hidden" id="AppointmentIdInput">
+                        <div style="overflow-y: auto; max-height: 400px; overflow-x: hidden; padding: 10px;">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <h4>Patient Info</h4>
+                                    <hr>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="PatientFirstNameInput">First Name:</label>
+                                    <input type="text" class="form-control" id="PatientFirstNameInput" placeholder="First Name" readonly>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="PatientLastNameInput">Last Name:</label>
+                                    <input type="text" class="form-control" id="PatientLastNameInput" placeholder="Last Name" readonly>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="PatientDOBInput">DOB:</label>
+                                    <input type="text" class="form-control" id="PatientDOBInput" placeholder="01/01/1970" readonly>
+                                </div>
+                                <div class="col-sm-12">
+                                    <h4>Contact Info</h4>
+                                    <hr>
+                                </div>
+                                <input type="hidden" id="AppointmentIdInput" th:field="${appointment.id}">
+                                <input type="hidden" id="AppointmentPatientInput" th:field="${appointment.patient}">
+                                <div class="col-sm-4 pad-input">
+                                    <label for="AppointmentPhoneNumberInput">Phone Number:</label>
+                                    <input type="text" class="form-control" id="AppointmentPhoneNumberInput" th:field="${appointment.phonenumber}" placeholder="000-000-0000">
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="AppointmentEmailInput">Email Address:</label>
+                                    <input type="text" class="form-control" id="AppointmentEmailInput" th:field="${appointment.emailaddress}" placeholder="demo@example.com">
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="AppointmentDateTimeInput">Appointment Date and Time:</label>
+                                    <input type="text" class="form-control" id="AppointmentDateTimeInput" th:field="${appointment.datetime}" placeholder="01/01/1970" readonly>
+                                </div>
+                                <div class="col-sm-12">
+                                    <h4>Office Info</h4>
+                                    <hr>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="AppointmentRadiologistInput">Radiologist:</label>
+                                    <select class="form-control" id="AppointmentRadiologistInput" th:field="${appointment.radiologist}">
+                                        <option th:each="radiologist : ${radiologists_list}" th:value="${radiologist.getUser_id()}" th:text="${radiologist.getFull_name()}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="AppointmentTechnicianInput">Technician:</label>
+                                    <select class="form-control" id="AppointmentTechnicianInput" th:field="${appointment.technician}">
+                                        <option th:each="technician : ${technicians_list}" th:value="${technician.getUser_id()}" th:text="${technician.getFull_name()}"></option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="submit" class="btn btn-md btn-primary savePatientButton" style="float:right; padding-right: 10px;" value="Schedule Appointment"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="ContentWrapper">
         <div class="row"> <!--      NAVBAR      -->
             <div class="col-sm-12 sn-navbar">
                 <div class="sn-navbar-btn" onclick="window.location='/home'">
@@ -86,7 +201,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="order : ${orders_list}">
+                                <tr th:each="order : ${orders_list}"
+                                
+                                th:attr="data-id=${order.getId()}, 
+                                data-patient=${order.getPatient()},
+                                data-first_name=${order.getPatientObject().getFirst_name()},
+                                data-last_name=${order.getPatientObject().getLast_name()},
+                                data-dob=${order.getPatientObject().getDob()}
+                                ">
                                     <td th:text="${order.getId()}">-1</td>
                                     <td th:text="${order.getPatient()}">-1</td>
                                     <td th:text="${order.getReferral_md()}">-1</td>

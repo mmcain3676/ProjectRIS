@@ -12,6 +12,7 @@ public class Order {
     private Long patient;
     private Long modality;
     private Long referral_md;
+    private Long appointment;
     private String notes;
     private Long status;
     private Long report;
@@ -35,6 +36,10 @@ public class Order {
     public Long getReferral_md(){
         return this.referral_md;
     }
+    
+    public Long getAppointment(){
+        return this.appointment;
+    }
 
     public String getNotes(){
         return this.notes;
@@ -47,6 +52,7 @@ public class Order {
     public Long getReport(){
         return this.report;
     }
+
 
 
     //      SETTERS
@@ -65,6 +71,10 @@ public class Order {
 
     public void setReferral_md(Long referral_md){
         this.referral_md = referral_md;
+    }
+
+    public void setAppointment(Long appointment){
+        this.appointment = appointment;
     }
 
     public void setNotes(String notes){

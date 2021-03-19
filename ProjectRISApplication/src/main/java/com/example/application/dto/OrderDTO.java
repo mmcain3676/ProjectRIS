@@ -12,6 +12,7 @@ public class OrderDTO {
     private String notes;
     private Long status;
     private Long report;
+    private Long appointment;
 
     private Patient patientObject;
     private User referral_mdObject;
@@ -24,15 +25,19 @@ public class OrderDTO {
         Long modality,
         String notes,
         Long status,
-        Long report)
+        Long report,
+        Long appointment)
     {
         this.id = id;
         this.patientObject = patientObject;
+        this.patient = patientObject.getId();
         this.referral_mdObject = referral_mdObject;
+        this.referral_md = referral_mdObject.getUser_id();
         this.modality = modality;
         this.notes = notes;
         this.status = status;
         this.report = report;
+        this.appointment = appointment;
     }
 
 
@@ -73,6 +78,10 @@ public class OrderDTO {
     public User getReferral_mdObject(){
         return this.referral_mdObject;
     }
+    
+    public Long getAppointment(){
+        return this.appointment;
+    }
 
 
     //      SETTERS
@@ -111,5 +120,9 @@ public class OrderDTO {
 
     public void setReferral_mdObject(User referral_mdObject){
         this.referral_mdObject = referral_mdObject;
+    }
+
+    public void setAppointment(Long appointment){
+        this.appointment = appointment;
     }
 }

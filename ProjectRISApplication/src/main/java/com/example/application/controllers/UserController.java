@@ -56,7 +56,8 @@ public class UserController {
                     order.getModality(),
                     order.getNotes(),
                     order.getStatus(),
-                    order.getReport());
+                    order.getReport(),
+                    order.getAppointment());
     
                 new_order.setId(order.getId());
     

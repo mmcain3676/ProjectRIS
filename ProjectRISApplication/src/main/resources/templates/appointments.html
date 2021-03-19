@@ -81,6 +81,15 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr th:each="appointment : ${appointments_list}">
+                                    <th th:text="${appointment.getId()}">Appointment ID</th>
+                                    <th th:text="${appointment.getPatient()}">Patient</th>
+                                    <th th:text="${appointment.getModality()}">Modality</th>
+                                    <th th:text="${appointment.getDatetime()}">Date and Time</th>
+                                    <th th:text="${appointment.getRadiologist()}">Radiologist</th>
+                                    <th th:text="${appointment.getTechnician()}">Technician</th>
+                                    <th></th>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
