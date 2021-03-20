@@ -4,8 +4,6 @@
     <title>User Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     
@@ -16,11 +14,22 @@
     <script>
         $(document).ready(function(){
             
+            $('body').on('click', '.appointmentCompleteOrderButton', function(){
+                window.location="/imaging/order/" + $(this).parents('tr').data('order');
+            });
+
+
+            $('#AppointmentTable, #TodaysAppointmentTable, #CheckedInAppointmentTable').dataTable({
+                "bPaginate": false,
+                "bFilter": true,
+                "bInfo": false,
+                "bAutoWidth": false }
+            );
         });
     </script>
 </head>
 <body>
-    <div class="container" id="ContentWrapper">
+    <div class="container">
         <div class="row"> <!--      NAVBAR      -->
             <div class="col-sm-12 sn-navbar">
                 <div class="sn-navbar-btn" onclick="window.location='/home'">
@@ -54,61 +63,84 @@
         </div>
         <div class="row">
             <div class="col-sm-12 panel">
+
                 <div class="inset-panel">
                     <div class="row">
-                        <div class="col-sm-4"><p></p></div>
-                        <div class="col-sm-4">
-                            <center><h3>New Order</h3></center>
+                        <div class="col-sm-12">
+                            <center><h3>Imaging Order</h3></center>
                         </div>
                     </div>
                     <br>
                     <h3>Patient Info</h3>
                     <hr>
                     <div class="row">
-                        <div class="col-sm-4">
-                            <label for="PatientLastName">Last Name:</label>
-                            <input type="text" class="form-control pad-input" id="PatientLastName" th:value="${patient.last_name}" readonly>
+                        <div class="col-sm-4 pad-input">
+                            <label>First Name:</label>
+                            <input class="form-control" th:value="${patient.getFirst_name()}" readonly>
                         </div>
-                        <div class="col-sm-4">
-                            <label for="PatientFirstName">First Name:</label>
-                            <input type="text" class="form-control pad-input" id="PatientFirstName" th:value="${patient.first_name}" readonly>
+                        <div class="col-sm-4 pad-input">
+                            <label>Last Name:</label>
+                            <input class="form-control" th:value="${patient.getLast_name()}" readonly>
                         </div>
-                        <div class="col-sm-4">
-                            <label for="PatientDOB">Date of Birth:</label>
-                            <input type="text" class="form-control pad-input" id="PatientDOB" th:value="${patient.dob}" readonly>
+                        <div class="col-sm-4 pad-input">
+                            <label>Date of Birth:</label>
+                            <input class="form-control" th:value="${patient.getDob()}" readonly>
                         </div>
                     </div>
                     <br>
                     <h3>Order Info</h3>
                     <hr>
-                    <form action="#" th:action="@{/referral/updateOrder}" method="post">
-                        <input type="hidden" id="OrderPatientInput" th:field="${order.patient}">
-                        <input type="hidden" id="OrderReferralMDInput" th:field="${order.referral_md}">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label for="OrderModalityInput">Modality:</label>
-                                <select class="form-control" id="OrderModalityInput" th:field="${order.modality}">
-                                    <option value="1">MRI</option>
-                                    <option value="2">CT Scan</option>
-                                    <option value="3">X-Ray</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-8">
-                                <label for="OrderNotesInput">Order Notes:</label>
-                                <textarea class="form-control" id="OrderNotesInput" th:field="${order.notes}"></textarea>
-                            </div>
+                    <div class="row">
+                        <div class="col-sm-4 pad-input">
+                            <label>Modality:</label>
+                            <input class="form-control" th:value="${order.getModality()}" readonly>
                         </div>
-                        <br>
+                        <div class="col-sm-8 pad-input">
+                            <label>Referral MD Notes:</label>
+                            <textarea class="form-control" th:text="${order.getNotes()}" readonly></textarea>
+                        </div>
+                    </div>
+                    <br>
+                    <h3>Imaging</h3>
+                    <hr>
+                    
+                    <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
                         <div class="row">
-                            <div class="col-sm-11">
-                                <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Submit Order"/>
+                            <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
+                            <div class="col-sm-3 pad-input">
+                                <input type="file" name="file" class="form-control-file" accept=".png,.jpeg">
                             </div>
-                            <div class="col-sm-1">
-                                <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Cancel" onclick="window.location='/referral'"/>
+                            <div class="col-sm-9 pad-input">
+                                <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+                            </div>
+                            <div class="col-sm-12 pad-input">
+                                <label>Uploaded Images:</label>
+                                <div class="uploaded-img-div">
+                                    <table>
+                                        <tbody>
+                                            <tr><td><p class="view-a">MRI_Scan_432.jpg</p></td></tr>
+                                            <tr><td><p class="view-a">MRI_Scan_433.jpg</p></td></tr>
+                                            <tr><td><p class="view-a">MRI_Scan_434.jpg</p></td></tr>
+                                            <tr><td><p class="view-a">MRI_Scan_435.jpg</p></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 pad-input">
                             </div>
                         </div>
                     </form>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Complete Order"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Back"/>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

@@ -27,6 +27,8 @@
                 $('#PatientLastNameInput').val(orderRow.data('last_name'));
                 $('#PatientDOBInput').val(orderRow.data('dob'));
                 $('#AppointmentPatientInput').val(orderRow.data('patient'));
+                $('#AppointmentOrderInput').val(orderRow.data('order'));
+                $('#AppointmentModalityInput').val(orderRow.data('modality'));
             });
 
             $(document).on('click','.close-modal', function(){
@@ -47,7 +49,7 @@
                 ]}
             );
             
-            $('#AppointmentDateTimeInput').datepicker({
+            $('#AppointmentDateInput').datepicker({
                 changeMonth: true, 
                 changeYear: true, 
                 dateFormat: 'yy-mm-dd',
@@ -98,17 +100,24 @@
                                 </div>
                                 <input type="hidden" id="AppointmentIdInput" th:field="${appointment.id}">
                                 <input type="hidden" id="AppointmentPatientInput" th:field="${appointment.patient}">
-                                <div class="col-sm-4 pad-input">
+                                <input type="hidden" id="AppointmentOrderInput" th:field="${appointment.order}">
+                                <div class="col-sm-3 pad-input">
                                     <label for="AppointmentPhoneNumberInput">Phone Number:</label>
                                     <input type="text" class="form-control" id="AppointmentPhoneNumberInput" th:field="${appointment.phonenumber}" placeholder="000-000-0000">
                                 </div>
-                                <div class="col-sm-4 pad-input">
+                                <div class="col-sm-3 pad-input">
                                     <label for="AppointmentEmailInput">Email Address:</label>
                                     <input type="text" class="form-control" id="AppointmentEmailInput" th:field="${appointment.emailaddress}" placeholder="demo@example.com">
                                 </div>
-                                <div class="col-sm-4 pad-input">
-                                    <label for="AppointmentDateTimeInput">Appointment Date and Time:</label>
-                                    <input type="text" class="form-control" id="AppointmentDateTimeInput" th:field="${appointment.datetime}" placeholder="01/01/1970" readonly>
+                                <div class="col-sm-3 pad-input">
+                                    <label for="AppointmentDateInput">Appointment Date:</label>
+                                    <input type="text" class="form-control" id="AppointmentDateInput" th:field="${appointment.date}" placeholder="01/01/1970" readonly>
+                                </div>
+                                <div class="col-sm-3 pad-input">
+                                    <label for="AppointmentTimeInput">Appointment Time:</label>
+                                    <select class="form-control" id="AppointmentTimeInput" th:field="${appointment.time}">
+                                        <option th:each="time : ${times_list}" th:value="${time}" th:text="${time}"></option>
+                                    </select>
                                 </div>
                                 <div class="col-sm-12">
                                     <h4>Office Info</h4>
@@ -126,7 +135,14 @@
                                         <option th:each="technician : ${technicians_list}" th:value="${technician.getUser_id()}" th:text="${technician.getFull_name()}"></option>
                                     </select>
                                 </div>
-
+                                <div class="col-sm-4 pad-input">
+                                    <label for="AppointmentModalityInput">Modality:</label>
+                                    <select class="form-control" id="AppointmentModalityInput" th:field="${appointment.modality}" readonly>
+                                        <option value="1">MRI</option>
+                                        <option value="2">CT Scan</option>
+                                        <option value="3">X-Ray</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <br>
@@ -203,11 +219,12 @@
                             <tbody>
                                 <tr th:each="order : ${orders_list}"
                                 
-                                th:attr="data-id=${order.getId()}, 
+                                th:attr="data-order=${order.getId()}, 
                                 data-patient=${order.getPatient()},
                                 data-first_name=${order.getPatientObject().getFirst_name()},
                                 data-last_name=${order.getPatientObject().getLast_name()},
-                                data-dob=${order.getPatientObject().getDob()}
+                                data-dob=${order.getPatientObject().getDob()},
+                                data-modality=${order.getModality()}
                                 ">
                                     <td th:text="${order.getId()}">-1</td>
                                     <td th:text="${order.getPatient()}">-1</td>

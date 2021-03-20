@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -44,14 +47,66 @@ public class ReceptionistController {
 
     @GetMapping("/appointments")
     public String appointmentView(HttpSession session, Model model)
-    {
-        model.addAttribute("appointments_list", appointmentRepository.findAll());
-        return "appointments";
+    { 
+        Iterable<Appointment> appointments_list = appointmentRepository.findAll();
+
+        //  Find checked-in/closed appointments
+
+        ArrayList<Appointment> checked_in_appointments_list = new ArrayList<Appointment>();
+
+        for(Appointment appointment : appointments_list)
+        {
+            if(appointment.getCheckedin() == 1)
+            {
+                checked_in_appointments_list.add(appointment);
+            }
+        }
+
+        //  Find today's appointments
+
+        ArrayList<Appointment> todays_appointments_list = new ArrayList<Appointment>();
+
+        for(Appointment appointment : appointments_list) 
+        {
+            String datetime = appointment.getDatetime();
+            String date = datetime.split(" ")[0];
+            String today = LocalDate.now().toString();
+
+            if(date.equals(today) && appointment.getCheckedin() != 1)
+            {
+                todays_appointments_list.add(appointment);
+            }
+        }
+
+        
+        model.addAttribute("appointments_list", appointments_list);
+        model.addAttribute("todays_appointments_list", todays_appointments_list);
+        model.addAttribute("checked_in_appointments_list", checked_in_appointments_list);
+        model.addAttribute("checkin_appointment", new Appointment());
+        
+        return "desk_appointments";
     }
 
     @GetMapping("/orders")
     public String orderView(HttpSession session, Model model)
     {
+        //  Create all timeslots
+
+        ArrayList<String> times_list = new ArrayList<String>();
+        int[] times = {8, 9, 10, 11, 12, 1, 2, 3, 4};
+        for(int time : times)
+        {
+            if(time >= 8 && time < 12)
+            {
+                times_list.add(time + ":00am");
+                times_list.add(time + ":30am");
+            }
+            else
+            {
+                times_list.add(time + ":00pm");
+                times_list.add(time + ":30pm");
+            }
+        }
 
         //  Find doctors and technicians
 
@@ -83,6 +138,8 @@ public class ReceptionistController {
 
         for(Order order : all_orders)
         {
+            System.out.println(order.getId());
+            System.out.println(order.getAppointment());
             if(order.getAppointment() == null || order.getAppointment() <= 0)
             {
                 orders.add(order);
@@ -113,17 +170,31 @@ public class ReceptionistController {
             }
         }
 
+        model.addAttribute("times_list", times_list);
         model.addAttribute("radiologists_list", radiologists);
         model.addAttribute("technicians_list", technicians);
         model.addAttribute("orders_list", orderDTO_list);
         model.addAttribute("appointment", new Appointment());
+
         return "orders";
     }
 
     @PostMapping("/updateAppointment")
-    public String updateUser(@ModelAttribute("appointment") Appointment appointment, Model model, BindingResult result)
+    public String updateAppointment(@ModelAttribute("appointment") Appointment appointment, Model model, BindingResult result)
     {
-        appointmentRepository.save(appointment);
+
+        appointment.setDatetime(appointment.getDate() + " " + appointment.getTime().substring(0, appointment.getTime().length() - 2));      //  Cut of the -am or -pm
+
+        Appointment newAppointment = appointmentRepository.save(appointment);
+        orderRepository.setAppointmentForOrder(newAppointment.getId(), newAppointment.getOrder());
+
+        return "redirect:/staff/appointments";
+    }
+
+    @PostMapping("/checkinAppointment")
+    public String checkinAppointment(@ModelAttribute("checkin_appointment") Appointment appointment, Model model, BindingResult result)
+    {
+        appointmentRepository.setCheckedInForAppointment(appointment.getId());
         return "redirect:/staff/appointments";
     }
 }

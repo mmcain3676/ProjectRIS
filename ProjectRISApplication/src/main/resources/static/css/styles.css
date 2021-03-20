@@ -49,8 +49,6 @@ body {
 .inset-panel {
     background-color: #fff;
     border-radius: 5px;
-    border-width: 2px;
-    border-style: solid;
     padding: 20px;
     margin-bottom: 20px;
 }

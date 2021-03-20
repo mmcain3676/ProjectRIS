@@ -14,7 +14,17 @@
     <script>
         $(document).ready(function(){
             
-            $('#AppointmentTable').dataTable({
+            $('body').on('click', '.appointmentCheckInButton', function(){
+
+                var appointmentRow = $(this).parents('tr');
+
+                $('#AppointmentCheckInInput').val(appointmentRow.data('appointment'));
+                $('#AppointmentCheckInForm').submit();
+
+            });
+
+
+            $('#AppointmentTable, #TodaysAppointmentTable, #CheckedInAppointmentTable').dataTable({
                 "bPaginate": false,
                 "bFilter": true,
                 "bInfo": false,
@@ -62,7 +72,90 @@
                 <div class="inset-panel">
                     <div class="row">
                         <div class="col-sm-12">
-                            <center><h3>Appointments</h3></center>
+                            <center><h3>Checked-In Appointments</h3></center>
+                        </div>
+                    </div>
+                    <hr>
+                    <br>
+                    <div style="overflow-y: auto; max-height: 600px;">
+                        <table id="CheckedInAppointmentTable" class="display">
+                            <thead>
+                                <tr>
+                                    <th>Appointment ID</th>
+                                    <th>Patient</th>
+                                    <th>Modality</th>
+                                    <th>Date and Time</th>
+                                    <th>Radiologist</th>
+                                    <th>Technician</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="appointment : ${checked_in_appointments_list}"
+                                th:attr="data-appointment=${appointment.getId()}">
+
+                                    <th th:text="${appointment.getId()}">Appointment ID</th>
+                                    <th th:text="${appointment.getPatient()}">Patient</th>
+                                    <th th:text="${appointment.getModality()}">Modality</th>
+                                    <th th:text="${appointment.getDatetime()}">Date and Time</th>
+                                    <th th:text="${appointment.getRadiologist()}">Radiologist</th>
+                                    <th th:text="${appointment.getTechnician()}">Technician</th>
+                                    <th>
+                                        <p th:if="${appointment.closed == 1}" style="margin: 0;">Closed</p>
+                                        <p th:unless="${appointment.closed == 1}" style="margin: 0;">In Progress</p>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <form action="#" id="AppointmentCheckInForm" th:action="@{/staff/checkinAppointment}" method="post">
+                    <input type="hidden" id="AppointmentCheckInInput" th:field="${checkin_appointment.id}">
+                </form>
+
+                <div class="inset-panel">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <center><h3>Today's Appointments</h3></center>
+                        </div>
+                    </div>
+                    <hr>
+                    <br>
+                    <div style="overflow-y: auto; max-height: 600px;">
+                        <table id="TodaysAppointmentTable" class="display">
+                            <thead>
+                                <tr>
+                                    <th>Appointment ID</th>
+                                    <th>Patient</th>
+                                    <th>Modality</th>
+                                    <th>Date and Time</th>
+                                    <th>Radiologist</th>
+                                    <th>Technician</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="appointment : ${todays_appointments_list}"
+                                th:attr="data-appointment=${appointment.getId()}">
+
+                                    <th th:text="${appointment.getId()}">Appointment ID</th>
+                                    <th th:text="${appointment.getPatient()}">Patient</th>
+                                    <th th:text="${appointment.getModality()}">Modality</th>
+                                    <th th:text="${appointment.getDatetime()}">Date and Time</th>
+                                    <th th:text="${appointment.getRadiologist()}">Radiologist</th>
+                                    <th th:text="${appointment.getTechnician()}">Technician</th>
+                                    <th><p class="view-a appointmentCheckInButton">Check-In</p></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="inset-panel">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <center><h3>All Appointments</h3></center>
                         </div>
                     </div>
                     <hr>

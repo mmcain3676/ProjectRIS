@@ -10,6 +10,8 @@ public class Appointment {
     private Long id;
 
     private Long patient;
+    @Column(name = "order_id")
+    private Long order;
     private Long modality;
     @Column(name = "date_time")
     private String datetime;
@@ -19,69 +21,129 @@ public class Appointment {
     private String phonenumber;
     @Column(name = "email_address")
     private String emailaddress;
+    @Column(name = "checked_in")
+    private int checkedin;
+    private int closed;
 
-    public void setId(Long id){
-        this.id = id;
-    }
+    @Transient
+    private String date;
+    @Transient
+    private String time;
+
+
+
+    //  GETTERS
 
     public Long getId(){
         return this.id;
-    }
-
-    public void setPatient(Long patient) {
-        this.patient = patient;
     }
 
     public Long getPatient() {
         return this.patient;
     }
 
-    public void setModality(Long modality) {
-        this.modality = modality;
+    public Long getOrder(){
+        return this.order;
     }
 
     public Long getModality() {
         return this.modality;
     }
-
-    public void setDatetime(String datetime) {
-        this.datetime = datetime;
-    }
-
+    
     public String getDatetime() {
         return this.datetime;
-    }
-
-    public void setRadiologist(Long radiologist) {
-        this.radiologist = radiologist;
     }
 
     public Long getRadiologist() {
         return this.radiologist;
     }
 
-    public void setTechnician(Long technician) {
-        this.technician = technician;
-    }
-
     public Long getTechnician() {
         return this.technician;
-    }
-
-    public void setPhonenumber(String phonenumber){
-        this.phonenumber = phonenumber;
     }
 
     public String getPhonenumber(){
         return this.phonenumber;
     }
 
+    public String getEmailaddress(){
+        return this.emailaddress;
+    }
+
+    public String getDate(){
+        return this.date;
+    }
+
+    public String getTime(){
+        return this.time;
+    }
+
+    public int getCheckedin(){
+        return this.checkedin;
+    }
+
+    public int getClosed(){
+        return this.closed;
+    }
+
+
+    //  SETTERS
+
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    public void setPatient(Long patient) {
+        this.patient = patient;
+    }
+
+    public void setOrder(Long order){
+        this.order = order;
+    }
+
+    public void setModality(Long modality) {
+        this.modality = modality;
+    }
+
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
+    }
+
+    public void setRadiologist(Long radiologist) {
+        this.radiologist = radiologist;
+    }
+
+    public void setTechnician(Long technician) {
+        this.technician = technician;
+    }
+
+    public void setPhonenumber(String phonenumber){
+        this.phonenumber = phonenumber;
+    }
+
     public void setEmailaddress(String emailaddress){
         this.emailaddress = emailaddress;
     }
 
-    public String getEmailaddress(){
-        return this.emailaddress;
+    public void setDate(String date){
+        this.date = date;
     }
+
+    public void setTime(String time){
+        this.time = time;
+    }
+
+    public void setCheckedin(int checkedin){
+        this.checkedin = checkedin;
+    }
+
+    public void setClosed(int closed){
+        this.closed = closed;
+    }
+
+
+    
+
+
 
 }
