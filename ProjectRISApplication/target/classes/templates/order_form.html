@@ -81,7 +81,7 @@
                     <br>
                     <h3>Order Info</h3>
                     <hr>
-                    <form action="#" th:action="@{/referral/updateOrder}" method="post">
+                    <form action="#" th:action="@{/referral/submitOrder}" method="post">
                         <input type="hidden" id="OrderPatientInput" th:field="${order.patient}">
                         <input type="hidden" id="OrderReferralMDInput" th:field="${order.referral_md}">
                         <div class="row">

@@ -45,6 +45,8 @@ class LoginRedirectSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/css/**", "/images/**").permitAll()
             .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
             .antMatchers("/referral/**").hasAnyAuthority("ADMIN", "REFERRAL_DOCTOR")
+            .antMatchers("/staff/**").hasAnyAuthority("ADMIN", "RECEPTIONIST")
+            .antMatchers("/imaging/**").hasAnyAuthority("ADMIN", "TECHNICIAN")
             .antMatchers("/home").hasAnyAuthority("ADMIN", "USER", "REFERRAL_DOCTOR",  "RECEPTIONIST", "TECHNICIAN", "RADIOLOGIST")
             .anyRequest().authenticated()
             

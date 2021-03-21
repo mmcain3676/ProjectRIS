@@ -2,10 +2,10 @@ package com.example.application.persistence;
 import javax.persistence.*;
  
 @Entity
-@Table(name = "diagnosticreport")
+@Table(name = "diagnostic_reports")
 public class DiagnosticReport {
     @Id
-    @Column(name = "appointment_id")
+    @Column(name = "diagnostic_report_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

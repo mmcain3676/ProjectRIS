@@ -2,7 +2,7 @@ package com.example.application.persistence;
 import javax.persistence.*;
  
 @Entity
-@Table(name = "imaginginfo")
+@Table(name = "imaging_info")
 public class ImagingInfo {
     @Id
     @Column(name = "imaging_id")

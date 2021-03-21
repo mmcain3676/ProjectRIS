@@ -107,3 +107,7 @@ div.pad-input {
 }
 
 .ui-datepicker{z-index: 2000!important}
+
+ul {
+    list-style-type:none;
+}

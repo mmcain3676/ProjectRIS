@@ -76,10 +76,11 @@ public class ReferralMDController {
         return "order_form";
     }
 
-    @PostMapping("/updateOrder")
-    public String updateOrder(@ModelAttribute("order") Order order, Model model, BindingResult result)
+    @PostMapping("/submitOrder")
+    public String submitOrder(@ModelAttribute("order") Order order, Model model, BindingResult result)
     {
 
+        order.setStatus(Long.valueOf(1));
         orderRepository.save(order);
         
 

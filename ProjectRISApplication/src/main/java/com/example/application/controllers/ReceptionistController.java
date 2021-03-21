@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -50,41 +47,9 @@ public class ReceptionistController {
     { 
         Iterable<Appointment> appointments_list = appointmentRepository.findAll();
 
-        //  Find checked-in/closed appointments
-
-        ArrayList<Appointment> checked_in_appointments_list = new ArrayList<Appointment>();
-
-        for(Appointment appointment : appointments_list)
-        {
-            if(appointment.getCheckedin() == 1)
-            {
-                checked_in_appointments_list.add(appointment);
-            }
-        }
-
-        //  Find today's appointments
-
-        ArrayList<Appointment> todays_appointments_list = new ArrayList<Appointment>();
-
-        for(Appointment appointment : appointments_list) 
-        {
-            String datetime = appointment.getDatetime();
-            String date = datetime.split(" ")[0];
-            String today = LocalDate.now().toString();
-
-            if(date.equals(today) && appointment.getCheckedin() != 1)
-            {
-                todays_appointments_list.add(appointment);
-            }
-        }
-
-        
         model.addAttribute("appointments_list", appointments_list);
-        model.addAttribute("todays_appointments_list", todays_appointments_list);
-        model.addAttribute("checked_in_appointments_list", checked_in_appointments_list);
-        model.addAttribute("checkin_appointment", new Appointment());
         
-        return "desk_appointments";
+        return "appointments";
     }
 
     @GetMapping("/orders")
@@ -116,7 +81,6 @@ public class ReceptionistController {
 
         for(User user : users)
         {
-            System.out.println(user.getUsername());
             for(Role role : user.getRoles())
             {
                 System.out.println(role.getName());
@@ -138,8 +102,6 @@ public class ReceptionistController {
 
         for(Order order : all_orders)
         {
-            System.out.println(order.getId());
-            System.out.println(order.getAppointment());
             if(order.getAppointment() == null || order.getAppointment() <= 0)
             {
                 orders.add(order);

@@ -104,27 +104,21 @@
                     <h3>Imaging</h3>
                     <hr>
                     
-                    <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
+                    <form enctype="multipart/form-data" method="POST" th:action="@{/imaging/upload-file}">
+                        <input type="hidden" id="ImagingUploadOrderIdInput" th:field="${order.id}">
                         <div class="row">
                             <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
                             <div class="col-sm-3 pad-input">
-                                <input type="file" name="file" class="form-control-file" accept=".png,.jpeg">
+                                <input type="file" name="file" class="form-control-file">
                             </div>
                             <div class="col-sm-9 pad-input">
                                 <button type="submit" class="btn btn-sm btn-primary">Upload</button>
                             </div>
                             <div class="col-sm-12 pad-input">
                                 <label>Uploaded Images:</label>
-                                <div class="uploaded-img-div">
-                                    <table>
-                                        <tbody>
-                                            <tr><td><p class="view-a">MRI_Scan_432.jpg</p></td></tr>
-                                            <tr><td><p class="view-a">MRI_Scan_433.jpg</p></td></tr>
-                                            <tr><td><p class="view-a">MRI_Scan_434.jpg</p></td></tr>
-                                            <tr><td><p class="view-a">MRI_Scan_435.jpg</p></td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <ul>
+                                    <li th:each="file_upload: ${file_uploads_list}"><p class="view-a" style="float:none;" th:text="${file_upload.getFilename()}"></p></li>
+                                </ul>
                             </div>
                             <div class="col-sm-4 pad-input">
                             </div>
@@ -132,11 +126,14 @@
                     </form>
                     <br>
                     <div class="row">
-                        <div class="col-sm-11">
-                            <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Complete Order"/>
-                        </div>
+                        <form method="POST" th:action="@{/imaging/completeOrder}">
+                            <input type="hidden" id="ImagingCompleteOrderIdInput" th:field="${order.id}">
+                            <div class="col-sm-11">
+                                <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Complete Order"/>
+                            </div>
+                        </form>
                         <div class="col-sm-1">
-                            <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Back"/>
+                            <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Back" onclick="window.location='/home'"/>
                         </div>
                     </div>
                 </div>
