@@ -301,3 +301,6 @@ public class UserController {
         return authentication.isAuthenticated();
     }
 }
+
+
+// NEW STUFF
