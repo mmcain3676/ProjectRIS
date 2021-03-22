@@ -138,7 +138,7 @@ public class ReceptionistController {
         model.addAttribute("orders_list", orderDTO_list);
         model.addAttribute("appointment", new Appointment());
 
-        return "orders";
+        return "orders_desk";
     }
 
     @PostMapping("/updateAppointment")

@@ -1,8 +1,6 @@
 package com.example.application.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,18 +16,20 @@ import java.util.Optional;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.Patient;
 import com.example.application.persistence.PatientAlertsList;
+import com.example.application.repositories.FileUploadRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.PatientRepository;
-import com.example.application.security.AppUserDetails;
 
 @Controller 
-@RequestMapping(path="/diagnotics") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="/diagnostics") // This means URL's start with /demo (after Application path)
 public class RadiologistController {
     
     @Autowired
     PatientRepository patientRepository;
     @Autowired
     OrderRepository orderRepository;
+    @Autowired
+    private FileUploadRepository fileUploadRepository;
 
     @PostMapping("/updatePatient")
     public String updatePatient(@ModelAttribute("patient") Patient patient, @ModelAttribute("alerts") PatientAlertsList alerts, Model model, BindingResult result)
@@ -51,13 +51,22 @@ public class RadiologistController {
     @GetMapping("/order/{order_id}")
     public String orderView(Model model, @PathVariable("order_id") Long order_id, Principal principal)
     {
-        
-        Optional<Order> find_order = orderRepository.findById(order_id);
-        if(find_order.isPresent())
+        Optional<Order> get_order = orderRepository.findById(order_id);
+        if(get_order.isPresent())
         {
+            Optional<Patient> get_patient = patientRepository.findById(get_order.get().getPatient());
+            if(get_patient.isPresent())
+            {
+                Order order = get_order.get();
+                Patient patient = get_patient.get();
 
+                model.addAttribute("order", order);
+                model.addAttribute("patient", patient);
+                model.addAttribute("file_uploads_list", fileUploadRepository.getAllFileUploadsByOrderId(order.getId()));
+                return "diagnostics_form";
+            }
         }
-        return "order_form";
+        return "redirect:/home";
     }
 
     @PostMapping("/submitOrder")

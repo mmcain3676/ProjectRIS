@@ -28,7 +28,6 @@ import com.example.application.repositories.UserRepository;
 import com.example.application.security.AppUserDetails;
 
 @Controller 
-//@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class UserController {
 
     @Autowired
@@ -234,6 +233,49 @@ public class UserController {
 
 
         return "home";
+    }
+
+    @GetMapping("/appointments")
+    public String getAppointments(Model model) 
+    {
+        Iterable<Appointment> appointments_list = appointmentRepository.findAll();
+
+        model.addAttribute("appointments_list", appointments_list);
+
+        return "appointments";
+    }
+
+    @GetMapping("/orders")
+    public String getOrders(Model model) 
+    {
+        Iterable<Order> orders = orderRepository.findAll();
+        ArrayList<OrderDTO> orderDTO_list = new ArrayList<OrderDTO>();
+        for(Order order : orders)
+        {
+            Optional<Patient> patientObject = patientRepository.findById(order.getPatient());
+            Optional<User> referral_mdObject = userRepository.findById(order.getReferral_md());
+
+            if(patientObject.isPresent() && referral_mdObject.isPresent())
+            {
+                OrderDTO new_order = new OrderDTO(
+                    order.getId(),
+                    patientObject.get(),
+                    referral_mdObject.get(),
+                    order.getModality(),
+                    order.getNotes(),
+                    order.getStatus(),
+                    order.getReport(),
+                    order.getAppointment());
+    
+                new_order.setId(order.getId());
+    
+                orderDTO_list.add(new_order);
+            }
+        }
+
+        model.addAttribute("orders_list", orderDTO_list);
+
+        return "orders";
     }
 
     @GetMapping("/login")

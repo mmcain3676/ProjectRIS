@@ -55,6 +55,12 @@
                 window.location="/imaging/order/" + $(this).parents('tr').data('order');
             });
 
+            $('body').on('click', '.completeDiagnosticReportButton', function(){
+                window.location="/diagnostics/order/" + $(this).parents('tr').data('order');
+            });
+
+            
+
 
             //      JS INITIALIZERS
 
@@ -222,19 +228,10 @@
                 <div sec:authorize="hasAnyAuthority('ADMIN', 'REFERRAL_DOCTOR')" class="sn-navbar-btn" onclick="window.location='/referral'">
                     Referrals
                 </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')" class="sn-navbar-btn" onclick="window.location='/staff/appointments'">
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST', 'TECHNICIAN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/appointments'">
                     Appointments
                 </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST')" class="sn-navbar-btn" onclick="window.location='/staff/orders'">
-                    Orders
-                </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'TECHNICIAN')" class="sn-navbar-btn" onclick="window.location='/imaging/appointments'">
-                    Appointments
-                </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/diagnostics/appointments'">
-                    Appointments
-                </div>
-                <div sec:authorize="hasAnyAuthority('ADMIN', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/diagnostics/appointments'">
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'RECEPTIONIST', 'RADIOLOGIST')" class="sn-navbar-btn" onclick="window.location='/orders'">
                     Orders
                 </div>
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
@@ -509,7 +506,7 @@
                                     <td th:text="${order.getNotes()}">-1</td>
                                     <td th:text="${order.getStatus()}">-1</td>
                                     <td th:text="${order.getReport()}">-1</td>
-                                    <td><p class="view-a completeDiagnosticReportButton">View Order</p></td>
+                                    <td><p class="view-a completeDiagnosticReportButton">Review Order</p></td>
                                 </tr>
                             </tbody>
                         </table>
