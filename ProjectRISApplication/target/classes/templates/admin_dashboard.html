@@ -182,7 +182,59 @@
                 "bInfo": false,
                 "bAutoWidth": false }
             );
+
+            $('body').on('click', '.patientCreateButton', function(){
+                $('.modal-tile, #PatientWarning').hide();
+                $('.modal, #ModifyPatientModal').show();
+                $("body").toggleClass("dialogIsOpen");
+
+                $('.form-control').attr('disabled', false);
+                $('.form-control').val('');
+                $('#PatientIdInput').val('');
+
+                $('#PatientModalTitle').html('Create New Patient')
+            });
+
+            $('body').on('click', '.patientSelectButton', function(){
+                $('.modal-tile, #PatientWarning').hide();
+                $('.modal, #ModifyPatientModal').show();
+                $("body").toggleClass("dialogIsOpen");
+                $('.form-control').val('');
+
+                var patientRow = $(this).parents('tr');
+
+                $('.form-control').attr('disabled', true);
+                $('#PatientIdInput').val($(patientRow).data('id'));
+                $('#PatientFirstNameInput').val($(patientRow).data('first_name'));
+                $('#PatientLastNameInput').val($(patientRow).data('last_name'));
+                $('#PatientDOBInput').val($(patientRow).data('dob'));
+                $('#PatientSexInput option[value="' + $(patientRow).data('sex') +'"]').attr('selected', true);
+                $('#PatientRaceInput option[value="' + $(patientRow).data('race') +'"]').attr('selected', true);
+                $('#PatientEthnicityInput option[value="' + $(patientRow).data('ethnicity') +'"]').attr('selected', true);
+
+                $('#PatientModalTitle').html('Patient Overview')
+            });
+            
+
+            $(document).on('click','.close-modal', function(){
+                $('.modal-tile, #PasswordWarning, #UserWarning').hide();
+                $("body").toggleClass("dialogIsOpen");
+                $('.user-password').val('');
+            });
+
+            
+            
+            
+            $('#PatientDOBInput').datepicker({
+                changeMonth: true, 
+                changeYear: true, 
+                dateFormat: 'yy-mm-dd',
+                container: '#ModifyPatientModal'
+            });
+
         });
+
+        
     </script>
 </head>
 <body>
@@ -288,6 +340,116 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal" style="display: none;">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyPatientModal">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 id="PatientModalTitle">Create New Patient</h1>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="PatientWarning" style="display: none; font-weight: bold;">
+                        <div class="col-sm-12 alert alert-danger" id="PatientWarningContent">
+                        </div>
+                    </div>
+                    <br>
+                    <form action="#" th:action="@{/referral/updatePatient}" method="post">
+                        <input type="hidden" id="PatientIdInput" th:field="${patient.id}">
+                        <div style="overflow-y: auto; max-height: 400px; overflow-x: hidden; padding: 10px;">
+                            <div class="row">
+                                <div class="col-sm-4 pad-input">
+                                    <label for="PatientFirstNameInput">First Name:</label>
+                                    <input type="text" class="form-control" id="PatientFirstNameInput" th:field="${patient.first_name}" placeholder="First Name" required>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="PatientLastNameInput">Last Name:</label>
+                                    <input type="text" class="form-control" id="PatientLastNameInput" th:field="${patient.last_name}" placeholder="Last Name" required>
+                                </div>
+                                <div class="col-sm-4 pad-input">
+                                    <label for="PatientDOBInput">Date of Birth:</label>
+                                    <input type="text" class="form-control" id="PatientDOBInput" th:field="${patient.dob}" readonly required>
+                                </div>
+                                <div class="col-sm-2 pad-input">
+                                    <label for="PatientSexInput">Sex:</label>
+                                    <select class="form-control" id="PatientSexInput" th:field="${patient.sex}">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-5 pad-input">
+                                    <label for="PatientRaceInput">Race:</label>
+                                    <select class="form-control" id="PatientRaceInput" th:field="${patient.race}">
+                                        <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                                        <option value="Asian">Asian</option>
+                                        <option value="Black or African American">Black or African American</option>
+                                        <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
+                                        <option value="White">White</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-5 pad-input">
+                                    <label for="PatientEthnicityInput">Ethnicity:</label>
+                                    <select class="form-control" id="PatientEthnicityInput" th:field="${patient.ethnicity}">
+                                        <option value="Hispanic or Latino">Hispanic or Latino</option>
+                                        <option value="Not Hispanic or Latino">Not Hispanic or Latino</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label>Patient Alerts</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <hr>
+                                    <div id="PatientAlerts">
+                                        <div class="pad-input">
+                                            <label for="LatexAlergy">Allergy to Latex</label>
+                                            <select class="form-control">
+                                                <option value="0">No</option>
+                                                <option value="1">Yes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="PatientAlerts">
+                                        <div class="pad-input">
+                                            <label for="LatexAlergy">Allergy to Blood Thinners</label>
+                                            <select class="form-control">
+                                                <option value="0">No</option>
+                                                <option value="1">Yes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="PatientAlerts">
+                                        <div class="pad-input">
+                                            <label for="LatexAlergy">Allergy to Dyes Which May Be Used In Imaging</label>
+                                            <select class="form-control">
+                                                <option value="0">No</option>
+                                                <option value="1">Yes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="submit" class="btn btn-md btn-primary savePatientButton" style="float:right; padding-right: 10px;" value="Begin Order"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container" id="ContentWrapper">
         <div class="row"> <!--      NAVBAR      -->
             <div class="col-sm-12 sn-navbar">
