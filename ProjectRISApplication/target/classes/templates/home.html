@@ -30,7 +30,8 @@
                 $('#PatientDOBInput').val(orderRow.data('dob'));
                 $('#AppointmentPatientInput').val(orderRow.data('patient'));
                 $('#AppointmentOrderInput').val(orderRow.data('order'));
-                $('#AppointmentModalityInput').val(orderRow.data('modality'));
+                $('#AppointmentModalityInput').val(orderRow.data('modalityid'));
+                $('#AppointmentModalityText').val(orderRow.data('modalityname'));
             });
             
             $(document).on('click','.close-modal', function(){
@@ -59,6 +60,12 @@
                 window.location="/diagnostics/order/" + $(this).parents('tr').data('order');
             });
 
+            $('body').on('click', '.placedOrderViewButton', function(){
+                window.location="/referral/order/" + $(this).parents('tr').data('order');
+            });
+
+            
+
             
 
 
@@ -68,7 +75,11 @@
                 "bPaginate": false,
                 "bFilter": true,
                 "bInfo": false,
-                "bAutoWidth": false }
+                "bAutoWidth": false,
+                "columnDefs": [
+                    {"visible" : false,
+                     "targets" : [0]}
+                ]}
             );
             
             $('#UnscheduledOrderTable').dataTable({
@@ -133,7 +144,7 @@
                     <br>
                     <form action="#" th:action="@{/staff/updateAppointment}" method="post">
                         <input type="hidden" id="AppointmentIdInput">
-                        <div style="overflow-y: auto; max-height: 400px; overflow-x: hidden; padding: 10px;">
+                        <div style="overflow-y: auto; max-height: 500px; overflow-x: hidden; padding: 10px;">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <h4>Patient Info</h4>
@@ -194,11 +205,8 @@
                                 </div>
                                 <div class="col-sm-4 pad-input">
                                     <label for="AppointmentModalityInput">Modality:</label>
-                                    <select class="form-control" id="AppointmentModalityInput" th:field="${appointment.modality}" readonly>
-                                        <option value="1">MRI</option>
-                                        <option value="2">CT Scan</option>
-                                        <option value="3">X-Ray</option>
-                                    </select>
+                                    <input type="hidden" id="AppointmentModalityInput" th:field="${appointment.modality}">
+                                    <input type="text" class="form-control" id="AppointmentModalityText" readonly>
                                 </div>
                             </div>
                         </div>
@@ -283,15 +291,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="order : ${orders_list}">
+                                <tr th:each="order : ${placed_orders_list}"
+                                th:attr="data-order=${order.getId()}">
                                     <td th:text="${order.getId()}">-1</td>
-                                    <td th:text="${order.getPatientObject().getLast_name()} + ', ' + ${order.getPatientObject().getFirst_name()}">-1</td>
-                                    <td th:text="${order.getReferral_md()}">-1</td>
-                                    <td th:text="${order.getModality()}">-1</td>
+                                    <td th:text="${order.getPatientObject().getLast_name()} + ', ' + ${order.getPatientObject().getFirst_name}" >-1</td>
+                                    <td th:text="${order.getReferralMDObject().getFull_name()}">-1</td>
+                                    <td th:text="${order.getModalityObject().getName()}">-1</td>
                                     <td th:text="${order.getNotes()}">-1</td>
-                                    <td th:text="${order.getStatus()}">-1</td>
+                                    <td th:text="${order.getStatusObject().getName()}">-1</td>
                                     <td th:text="${order.getReport()}">-1</td>
-                                    <td><p class="view-a orderViewButton">View</p></td>
+                                    <td><p class="view-a placedOrderViewButton">View</p></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -323,16 +332,16 @@
                                 <tr th:each="appointment : ${checked_in_appointments_list}"
                                 th:attr="data-appointment=${appointment.getId()}">
 
-                                    <th th:text="${appointment.getId()}">Appointment ID</th>
-                                    <th th:text="${appointment.getPatient()}">Patient</th>
-                                    <th th:text="${appointment.getModality()}">Modality</th>
-                                    <th th:text="${appointment.getDatetime()}">Date and Time</th>
-                                    <th th:text="${appointment.getRadiologist()}">Radiologist</th>
-                                    <th th:text="${appointment.getTechnician()}">Technician</th>
-                                    <th>
-                                        <p th:if="${appointment.closed == 1}" style="margin: 0;">Closed</p>
+                                    <td th:text="${appointment.getId()}">Appointment ID</td>
+                                    <td th:text="${appointment.getPatientObject().getLast_name()} + ', ' + ${appointment.getPatientObject().getFirst_name()}">Patient</td>
+                                    <td th:text="${appointment.getModalityObject().getName()}">Modality</td>
+                                    <td th:text="${appointment.getDatetime()}">Date and Time</td>
+                                    <td th:text="${appointment.getRadiologistObject().getFull_name()}">Radiologist</td>
+                                    <td th:text="${appointment.getTechnicianObject().getFull_name()}">Technician</td>
+                                    <td>
+                                        <p th:if="${appointment.closed == 1}" style="margin: 0;">Concluded</p>
                                         <p th:unless="${appointment.closed == 1}" style="margin: 0;">In Progress</p>
-                                    </th>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -368,13 +377,13 @@
                                 <tr th:each="appointment : ${todays_appointments_list}"
                                 th:attr="data-appointment=${appointment.getId()}">
 
-                                    <th th:text="${appointment.getId()}">Appointment ID</th>
-                                    <th th:text="${appointment.getPatient()}">Patient</th>
-                                    <th th:text="${appointment.getModality()}">Modality</th>
-                                    <th th:text="${appointment.getDatetime()}">Date and Time</th>
-                                    <th th:text="${appointment.getRadiologist()}">Radiologist</th>
-                                    <th th:text="${appointment.getTechnician()}">Technician</th>
-                                    <th><p class="view-a appointmentCheckInButton">Check-In</p></th>
+                                    <td th:text="${appointment.getId()}">Appointment ID</td>
+                                    <td th:text="${appointment.getPatientObject().getLast_name()} + ', ' + ${appointment.getPatientObject().getFirst_name()}">Patient</td>
+                                    <td th:text="${appointment.getModalityObject().getName()}">Modality</td>
+                                    <td th:text="${appointment.getDatetime()}">Date and Time</td>
+                                    <td th:text="${appointment.getRadiologistObject().getFull_name()}">Radiologist</td>
+                                    <td th:text="${appointment.getTechnicianObject().getFull_name()}">Technician</td>
+                                    <td><p class="view-a appointmentCheckInButton">Check-In</p></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -411,14 +420,15 @@
                                 data-first_name=${order.getPatientObject().getFirst_name()},
                                 data-last_name=${order.getPatientObject().getLast_name()},
                                 data-dob=${order.getPatientObject().getDob()},
-                                data-modality=${order.getModality()}
+                                data-modalityid=${order.getModality()},
+                                data-modalityname=${order.getModalityObject().getName()}
                                 ">
                                     <td th:text="${order.getId()}">-1</td>
-                                    <td th:text="${order.getPatient()}">-1</td>
-                                    <td th:text="${order.getReferral_md()}">-1</td>
-                                    <td th:text="${order.getModality()}">-1</td>
+                                    <td th:text="${order.getPatientObject().getLast_name()} + ', ' + ${order.getPatientObject().getFirst_name}" >-1</td>
+                                    <td th:text="${order.getReferralMDObject().getFull_name()}">-1</td>
+                                    <td th:text="${order.getModalityObject().getName()}">-1</td>
                                     <td th:text="${order.getNotes()}">-1</td>
-                                    <td th:text="${order.getStatus()}">-1</td>
+                                    <td th:text="${order.getStatusObject().getName()}">-1</td>
                                     <td th:text="${order.getReport()}">-1</td>
                                     <td><p class="view-a orderModifyButton">Schedule Appointment</p></td>
                                 </tr>
@@ -452,15 +462,15 @@
                                 <tr th:each="appointment : ${checked_in_appointments_list}"
                                     th:attr="data-appointment=${appointment.getId()},
                                              data-order=${appointment.getOrder()}
-                                ">
+                                " th:unless="${appointment.getClosed() == 1}">
 
-                                    <th th:text="${appointment.getId()}">Appointment ID</th>
-                                    <th th:text="${appointment.getPatient()}">Patient</th>
-                                    <th th:text="${appointment.getModality()}">Modality</th>
-                                    <th th:text="${appointment.getDatetime()}">Date and Time</th>
-                                    <th th:text="${appointment.getRadiologist()}">Radiologist</th>
-                                    <th th:text="${appointment.getTechnician()}">Technician</th>
-                                    <th><p class="view-a appointmentCompleteOrderButton">Complete Order</p></th>
+                                    <td th:text="${appointment.getId()}">Appointment ID</td>
+                                    <td th:text="${appointment.getPatientObject().getLast_name()} + ', ' + ${appointment.getPatientObject().getFirst_name}" >-1</td>
+                                    <td th:text="${appointment.getModalityObject().getName()}">Modality</td>
+                                    <td th:text="${appointment.getDatetime()}">Date and Time</td>
+                                    <td th:text="${appointment.getRadiologistObject().getFull_name()}">Radiologist</td>
+                                    <td th:text="${appointment.getTechnicianObject().getFull_name()}">Technician</td>
+                                    <td><p class="view-a appointmentCompleteOrderButton">Complete Order</p></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -500,11 +510,11 @@
                                 data-modality=${order.getModality()}
                                 ">
                                     <td th:text="${order.getId()}">-1</td>
-                                    <td th:text="${order.getPatientObject().getLast_name() + ', ' + order.getPatientObject().getFirst_name()}">-1</td>
-                                    <td th:text="${order.getReferral_mdObject().getFull_name()}">-1</td>
-                                    <td th:text="${order.getModality()}">-1</td>
+                                    <td th:text="${order.getPatientObject().getLast_name()} + ', ' + ${order.getPatientObject().getFirst_name}" >-1</td>
+                                    <td th:text="${order.getReferralMDObject().getFull_name()}">-1</td>
+                                    <td th:text="${order.getModalityObject().getName()}">-1</td>
                                     <td th:text="${order.getNotes()}">-1</td>
-                                    <td th:text="${order.getStatus()}">-1</td>
+                                    <td th:text="${order.getStatusObject().getName()}">-1</td>
                                     <td th:text="${order.getReport()}">-1</td>
                                     <td><p class="view-a completeDiagnosticReportButton">Review Order</p></td>
                                 </tr>

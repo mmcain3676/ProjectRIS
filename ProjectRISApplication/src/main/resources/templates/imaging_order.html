@@ -17,6 +17,10 @@
             $('body').on('click', '.appointmentCompleteOrderButton', function(){
                 window.location="/imaging/order/" + $(this).parents('tr').data('order');
             });
+            
+            $('body').on('click', '.btn-file', function(){
+                window.location="/download/" + $(this).data('file');
+            });
 
 
             $('#AppointmentTable, #TodaysAppointmentTable, #CheckedInAppointmentTable').dataTable({
@@ -84,7 +88,7 @@
                     <div class="row">
                         <div class="col-sm-4 pad-input">
                             <label>Modality:</label>
-                            <input class="form-control" th:value="${order.getModality()}" readonly>
+                            <input class="form-control" th:value="${order.getModalityObject().getName()}" readonly>
                         </div>
                         <div class="col-sm-8 pad-input">
                             <label>Referral MD Notes:</label>
@@ -108,7 +112,7 @@
                             <div class="col-sm-12 pad-input">
                                 <label>Uploaded Images:</label>
                                 <ul>
-                                    <li th:each="file_upload: ${file_uploads_list}"><p class="view-a" style="float:none;" th:text="${file_upload.getFilename()}"></p></li>
+                                    <li th:each="file_upload: ${file_uploads_list}"><p class="view-a btn-file" style="float:none;" th:attr="data-file=${file_upload.getFilename()}" th:text="${file_upload.getFilename()}"></p></li>
                                 </ul>
                             </div>
                             <div class="col-sm-4 pad-input">
@@ -116,17 +120,17 @@
                         </div>
                     </form>
                     <br>
-                    <div class="row">
-                        <form method="POST" th:action="@{/imaging/completeOrder}">
+                    <form method="POST" th:action="@{/imaging/completeOrder}">
+                        <div class="row">
                             <input type="hidden" id="ImagingCompleteOrderIdInput" th:field="${order.id}">
                             <div class="col-sm-11">
                                 <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Complete Order"/>
                             </div>
-                        </form>
-                        <div class="col-sm-1">
-                            <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Back" onclick="window.location='/home'"/>
+                            <div class="col-sm-1">
+                                <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Back" onclick="window.location='/home'"/>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
             </div>

@@ -15,11 +15,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.security.Principal;
 import java.util.Optional;
 
+import com.example.application.persistence.DiagnosticReport;
+import com.example.application.persistence.FileUpload;
+import com.example.application.persistence.Modality;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.Patient;
 import com.example.application.persistence.PatientAlertsList;
+import com.example.application.persistence.User;
+import com.example.application.repositories.DiagnosticRepository;
+import com.example.application.repositories.FileUploadRepository;
+import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.PatientRepository;
+import com.example.application.repositories.UserRepository;
 import com.example.application.security.AppUserDetails;
 
 @Controller 
@@ -27,12 +35,20 @@ import com.example.application.security.AppUserDetails;
 public class ReferralMDController {
     
     @Autowired
-    PatientRepository patientRepository;
+    private PatientRepository patientRepository;
     @Autowired
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private FileUploadRepository fileUploadRepository;
+    @Autowired
+    private DiagnosticRepository diagnosticRepository;
+    @Autowired
+    private ModalityRepository modalityRepository;
 
     @GetMapping("")
-    public String referralIndexView(Model model)
+    public String getIndex(Model model)
     {
         model.addAttribute("patient", new Patient());
         model.addAttribute("patient_list", patientRepository.findAll());
@@ -57,7 +73,7 @@ public class ReferralMDController {
     }
 
     @GetMapping("/neworder/{patient_id}")
-    public String orderView(Model model, @PathVariable("patient_id") Long patient_id, Principal principal)
+    public String getNewOrder(Model model, @PathVariable("patient_id") Long patient_id, Principal principal)
     {
         
         Optional<Patient> find_patient = patientRepository.findById(patient_id);
@@ -86,4 +102,53 @@ public class ReferralMDController {
 
         return "redirect:/home";
     }
+
+    @GetMapping("/order/{order_id}")
+    public String getOrder(Model model, @PathVariable("order_id") Long order_id, Principal principal)
+    {
+        Optional<Order> find_order = orderRepository.findById(order_id);
+        if(find_order.isPresent())
+        {
+            Order order = find_order.get();
+
+            Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+            if(find_modality.isPresent())
+            {
+                Modality modality = find_modality.get();
+
+                order.setModalityObject(modality);
+            }
+
+            model.addAttribute("order", order);
+
+            Optional<Patient> find_patient = patientRepository.findById(order.getPatient());
+            if(find_patient.isPresent())
+            {
+                Patient patient = find_patient.get();
+
+                model.addAttribute("patient", patient);
+            }
+
+            Optional<User> find_referralMD = userRepository.findById(order.getReferral_md());
+            if(find_referralMD.isPresent())
+            {
+                User referralMD = find_referralMD.get();
+
+                model.addAttribute("referral_md", referralMD);
+            }
+
+            Iterable<FileUpload> file_uploads_list = fileUploadRepository.getAllFileUploadsByOrderId(order.getId());
+
+            model.addAttribute("file_uploads_list", file_uploads_list);
+
+            DiagnosticReport diagnostics = diagnosticRepository.getDiagnosticReportByOrderId(order.getId());
+            if(diagnostics != null)
+            {
+                model.addAttribute("diagnostics", diagnostics);
+            }
+        }
+
+        return "order_overview";
+    }
+
 }

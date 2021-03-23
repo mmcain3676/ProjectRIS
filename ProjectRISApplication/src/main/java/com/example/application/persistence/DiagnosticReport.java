@@ -13,7 +13,7 @@ public class DiagnosticReport {
     private Long order;
     private Long patient;
     private Long radiologist;
-    private String notes;
+    private String diagnostic;
 
     //  GETTERS
 
@@ -33,8 +33,8 @@ public class DiagnosticReport {
         return this.radiologist;
     }
 
-    public String getNotes() {
-        return this.notes;
+    public String getDiagnostic() {
+        return this.diagnostic;
     }
 
     //  SETTERS
@@ -55,8 +55,8 @@ public class DiagnosticReport {
         this.radiologist = radiologist;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setDiagnostic(String diagnostic) {
+        this.diagnostic = diagnostic;
     }
 
 }

@@ -17,6 +17,10 @@
             $('body').on('click', '.appointmentCompleteOrderButton', function(){
                 window.location="/imaging/order/" + $(this).parents('tr').data('order');
             });
+            
+            $('body').on('click', '.btn-file', function(){
+                window.location="/download/" + $(this).data('file');
+            });
 
 
             $('#AppointmentTable, #TodaysAppointmentTable, #CheckedInAppointmentTable').dataTable({
@@ -84,7 +88,7 @@
                     <div class="row">
                         <div class="col-sm-4 pad-input">
                             <label>Modality:</label>
-                            <input class="form-control" th:value="${order.getModality()}" readonly>
+                            <input class="form-control" th:value="${order.getModalityObject().getName()}" readonly>
                         </div>
                         <div class="col-sm-8 pad-input">
                             <label>Referral MD Notes:</label>
@@ -98,7 +102,7 @@
                         <div class="col-sm-12 pad-input">
                             <label>Uploaded Images:</label>
                             <ul>
-                                <li th:each="file_upload: ${file_uploads_list}"><p class="view-a" style="float:none;" th:text="${file_upload.getFilename()}"></p></li>
+                                <li th:each="file_upload: ${file_uploads_list}"><p class="view-a btn-file" style="float:none;" th:attr="data-file=${file_upload.getFilename()}" th:text="${file_upload.getFilename()}"></p></li>
                             </ul>
                         </div>
                         <div class="col-sm-4 pad-input">
@@ -107,12 +111,12 @@
                     <br>
                     <h3>Diagnostic Report</h3>
                     <hr>
-                    <form method="POST" th:action="@{/diagnostics/submitReport}">
-                        <input type="hidden" id="DiagnosticReportPatientInput" th:field="${diagnostics.patient}">
-                        <input type="hidden" id="DiagnosticReportOrderInput" th:field="${diagnostics.order}">
+                    <form method="POST" th:action="@{/diagnostics/submitReport}" th:object="${diagnostics}">
+                        <input type="hidden" id="DiagnosticReportPatientInput" th:field="*{patient}">
+                        <input type="hidden" id="DiagnosticReportOrderInput" th:field="*{order}">
                         <div class="row">
                             <div class="col-sm-12 pad-input">
-                                <textarea class="form-control" th:field="${diagnostics.notes}"></textarea>
+                                <textarea class="form-control" th:field="*{diagnostic}"></textarea>
                             </div>
                         </div>
                         <br>

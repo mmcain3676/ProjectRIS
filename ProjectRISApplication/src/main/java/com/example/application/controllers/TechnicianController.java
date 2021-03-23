@@ -1,15 +1,14 @@
 package com.example.application.controllers;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import com.example.application.fileservice.StorageService;
-import com.example.application.persistence.Appointment;
 import com.example.application.persistence.FileUpload;
+import com.example.application.persistence.Modality;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.Patient;
-import com.example.application.repositories.AppointmentRepository;
 import com.example.application.repositories.FileUploadRepository;
+import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.PatientRepository;
 
@@ -30,40 +29,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class TechnicianController {
 
     @Autowired
-    private AppointmentRepository appointmentRepository;
-    @Autowired
     private OrderRepository orderRepository;
     @Autowired
     private PatientRepository patientRepository;
     @Autowired
     private FileUploadRepository fileUploadRepository;
+    @Autowired
+    private ModalityRepository modalityRepository;
 
     private StorageService storageService;
 
     public TechnicianController(StorageService storageService) {
         this.storageService = storageService;
-    }
-
-    @GetMapping("/appointments")
-    public String appointments(Model model)
-    {
-        Iterable<Appointment> appointments_list = appointmentRepository.findAll();
-
-        //  Find checked-in/closed appointments
-
-        ArrayList<Appointment> checked_in_appointments_list = new ArrayList<Appointment>();
-
-        for(Appointment appointment : appointments_list)
-        {
-            if(appointment.getCheckedin() == 1)
-            {
-                checked_in_appointments_list.add(appointment);
-            }
-        }
-        
-        model.addAttribute("checked_in_appointments_list", checked_in_appointments_list);
-
-        return "imaging_appointments";
     }
 
     @GetMapping("/order/{order_id}")
@@ -76,6 +53,16 @@ public class TechnicianController {
             if(get_patient.isPresent())
             {
                 Order order = get_order.get();
+                
+                Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+                if(find_modality.isPresent())
+                {
+                    Modality modality = find_modality.get();
+
+                    order.setModalityObject(modality);
+                }
+
+
                 Patient patient = get_patient.get();
 
                 model.addAttribute("order", order);
@@ -84,7 +71,7 @@ public class TechnicianController {
                 return "imaging_order";
             }
         }
-        return "redirect:/imaging/appointments";
+        return "redirect:/home";
     }
     
     @PostMapping("/upload-file")
@@ -112,7 +99,7 @@ public class TechnicianController {
     public String completeOrder(@ModelAttribute("order") Order order){
         
         orderRepository.setStatusForOrder(Long.valueOf(2), order.getId());
-        return "redirect:/imaging/appointments";
+        return "redirect:/home";
     }
 
 }

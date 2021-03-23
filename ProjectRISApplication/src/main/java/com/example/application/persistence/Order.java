@@ -16,6 +16,15 @@ public class Order {
     private String notes;
     private Long status;
     private Long report;
+
+    @Transient
+    Patient patientObject;
+    @Transient
+    User referral_mdObject;
+    @Transient
+    Modality modalityObject;
+    @Transient
+    OrderStatus statusObject;
     
 
 
@@ -53,6 +62,22 @@ public class Order {
         return this.report;
     }
 
+    public Patient getPatientObject(){
+        return this.patientObject;
+    }
+
+    public User getReferralMDObject(){
+        return this.referral_mdObject;
+    }
+
+    public Modality getModalityObject(){
+        return this.modalityObject;
+    }
+
+    public OrderStatus getStatusObject(){
+        return this.statusObject;
+    }
+
 
 
     //      SETTERS
@@ -87,6 +112,22 @@ public class Order {
 
     public void setReport(Long report){
         this.report = report;
+    }
+
+    public void setPatientObject(Patient patientObject){
+        this.patientObject = patientObject;
+    }
+
+    public void setReferralMDObject(User referralMDObject){
+        this.referral_mdObject = referralMDObject;
+    }
+
+    public void setModalityObject(Modality modalityObject){
+        this.modalityObject = modalityObject;
+    }
+
+    public void setStatusObject(OrderStatus statusObject){
+        this.statusObject = statusObject;
     }
 
     

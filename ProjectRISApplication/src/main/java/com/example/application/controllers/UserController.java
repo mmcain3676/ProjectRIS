@@ -1,12 +1,17 @@
 package com.example.application.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,14 +20,18 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
-import com.example.application.dto.OrderDTO;
+import com.example.application.fileservice.StorageService;
 import com.example.application.persistence.Appointment;
+import com.example.application.persistence.Modality;
 import com.example.application.persistence.Order;
+import com.example.application.persistence.OrderStatus;
 import com.example.application.persistence.Patient;
 import com.example.application.persistence.Role;
 import com.example.application.persistence.User;
 import com.example.application.repositories.AppointmentRepository;
+import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
+import com.example.application.repositories.OrderStatusRepository;
 import com.example.application.repositories.PatientRepository;
 import com.example.application.repositories.UserRepository;
 import com.example.application.security.AppUserDetails;
@@ -38,6 +47,16 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private ModalityRepository modalityRepository;
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
+    
+    private StorageService storageService;
+
+    public UserController(StorageService storageService) {
+        this.storageService = storageService;
+    }
     
     @GetMapping("/home")
     public String homeView(HttpSession session, Model model)
@@ -47,31 +66,39 @@ public class UserController {
         //////////////////////////////      REFERRAL MD DASHBOARD       //////////////////////////////
         
         Iterable<Order> order_list = orderRepository.findAllOrdersByReferralmd(((AppUserDetails) loggedInUser.getPrincipal()).getUserId());
-        ArrayList<OrderDTO> orderDTO_list = new ArrayList<OrderDTO>();
+        ArrayList<Order> placed_orders_list = new ArrayList<Order>();
+
         for(Order order : order_list)
         {
-            Optional<Patient> patientObject = patientRepository.findById(order.getPatient());
-            Optional<User> referral_mdObject = userRepository.findById(order.getReferral_md());
-
-            if(patientObject.isPresent() && referral_mdObject.isPresent())
+            Optional<Patient> find_patient = patientRepository.findById(order.getPatient());
+            if(find_patient.isPresent())
             {
-                OrderDTO new_order = new OrderDTO(
-                    order.getId(),
-                    patientObject.get(),
-                    referral_mdObject.get(),
-                    order.getModality(),
-                    order.getNotes(),
-                    order.getStatus(),
-                    order.getReport(),
-                    order.getAppointment());
-    
-                new_order.setId(order.getId());
-    
-                orderDTO_list.add(new_order);
+                order.setPatientObject(find_patient.get());
             }
+            
+            Optional<User> find_referral_md = userRepository.findById(order.getReferral_md());
+            if(find_referral_md.isPresent())
+            {
+                order.setReferralMDObject(find_referral_md.get());
+            }
+            
+            Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+            if(find_modality.isPresent())
+            {
+                order.setModalityObject(find_modality.get());
+            }
+            
+            Optional<OrderStatus> find_order_status = orderStatusRepository.findById(order.getStatus());
+            if(find_order_status.isPresent())
+            {
+                order.setStatusObject(find_order_status.get());
+            }
+
+            placed_orders_list.add(order);
+
         }
 
-        model.addAttribute("orders_list", orderDTO_list);
+        model.addAttribute("placed_orders_list", placed_orders_list);
 
         //////////////////////////////      RECEPTIONIST DASHBOARD      //////////////////////////////
 
@@ -85,6 +112,30 @@ public class UserController {
         {
             if(appointment.getCheckedin() == 1)
             {
+                Optional<Patient> find_patient = patientRepository.findById(appointment.getPatient());
+                if(find_patient.isPresent())
+                {
+                    appointment.setPatientObject(find_patient.get());
+                }
+                
+                Optional<Modality> find_modality = modalityRepository.findById(appointment.getModality());
+                if(find_modality.isPresent())
+                {
+                    appointment.setModalityObject(find_modality.get());
+                }
+                
+                Optional<User> find_radiologist = userRepository.findById(appointment.getRadiologist());
+                if(find_radiologist.isPresent())
+                {
+                    appointment.setRadiologistObject(find_radiologist.get());
+                }
+                
+                Optional<User> find_technician = userRepository.findById(appointment.getTechnician());
+                if(find_technician.isPresent())
+                {
+                    appointment.setTechnicianObject(find_technician.get());
+                }
+                
                 checked_in_appointments_list.add(appointment);
             }
         }
@@ -101,6 +152,30 @@ public class UserController {
 
             if(date.equals(today) && appointment.getCheckedin() != 1)
             {
+                Optional<Patient> find_patient = patientRepository.findById(appointment.getPatient());
+                if(find_patient.isPresent())
+                {
+                    appointment.setPatientObject(find_patient.get());
+                }
+                
+                Optional<Modality> find_modality = modalityRepository.findById(appointment.getModality());
+                if(find_modality.isPresent())
+                {
+                    appointment.setModalityObject(find_modality.get());
+                }
+                
+                Optional<User> find_radiologist = userRepository.findById(appointment.getRadiologist());
+                if(find_radiologist.isPresent())
+                {
+                    appointment.setRadiologistObject(find_radiologist.get());
+                }
+                
+                Optional<User> find_technician = userRepository.findById(appointment.getTechnician());
+                if(find_technician.isPresent())
+                {
+                    appointment.setTechnicianObject(find_technician.get());
+                }
+
                 todays_appointments_list.add(appointment);
             }
         }
@@ -153,70 +228,82 @@ public class UserController {
 
         //  Find all orders without appointments and add them to an OrdersDTO list (for patient and referral md info)
 
-        Iterable<Order> all_orders = orderRepository.findAll();
-        LinkedList<Order> orders = new LinkedList<Order>();
+        order_list = orderRepository.findAll();
+        LinkedList<Order> unscheduled_orders_list = new LinkedList<Order>();
 
-        for(Order order : all_orders)
+        for(Order order : order_list)
         {
             if(order.getAppointment() == null || order.getAppointment() <= 0)
             {
-                orders.add(order);
-            }
-        }
-        
-        ArrayList<OrderDTO> unscheduled_orderDTO_list = new ArrayList<OrderDTO>();
-        for(Order order : orders)
-        {
-            Optional<Patient> patientObject = patientRepository.findById(order.getPatient());
-            Optional<User> referral_mdObject = userRepository.findById(order.getReferral_md());
+                Optional<Patient> find_patient = patientRepository.findById(order.getPatient());
+                if(find_patient.isPresent())
+                {
+                    order.setPatientObject(find_patient.get());
+                }
+                
+                Optional<User> find_referral_md = userRepository.findById(order.getReferral_md());
+                if(find_referral_md.isPresent())
+                {
+                    order.setReferralMDObject(find_referral_md.get());
+                }
+                
+                Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+                if(find_modality.isPresent())
+                {
+                    order.setModalityObject(find_modality.get());
+                }
+            
+                Optional<OrderStatus> find_order_status = orderStatusRepository.findById(order.getStatus());
+                if(find_order_status.isPresent())
+                {
+                    order.setStatusObject(find_order_status.get());
+                }
 
-            if(patientObject.isPresent() && referral_mdObject.isPresent())
-            {
-                OrderDTO new_order = new OrderDTO(
-                    order.getId(),
-                    patientObject.get(),
-                    referral_mdObject.get(),
-                    order.getModality(),
-                    order.getNotes(),
-                    order.getStatus(),
-                    order.getReport(),
-                    order.getAppointment());
-    
-                new_order.setId(order.getId());
-    
-                unscheduled_orderDTO_list.add(new_order);
+                unscheduled_orders_list.add(order);
             }
         }
 
         model.addAttribute("times_list", times_list);
         model.addAttribute("radiologists_list", radiologists);
         model.addAttribute("technicians_list", technicians);
-        model.addAttribute("unscheduled_orders_list", unscheduled_orderDTO_list);
+        model.addAttribute("unscheduled_orders_list", unscheduled_orders_list);
         model.addAttribute("appointment", new Appointment());
+        System.out.println(order_list.iterator().hasNext());
 
         //////////////////////////////      RADIOLOGIST DASHBOARD   //////////////////////////////
 
-        ArrayList<OrderDTO> complete_imaging_orders_list = new ArrayList<OrderDTO>();
+        order_list = orderRepository.findAll();
+        ArrayList<Order> complete_imaging_orders_list = new ArrayList<Order>();
 
-        for(Order order : all_orders)
+        for(Order order : order_list)
         {
-            Optional<Patient> patientObject = patientRepository.findById(order.getPatient());
-            Optional<User> referral_mdObject = userRepository.findById(order.getReferral_md());
-            if(order.getStatus() == Long.valueOf(2) && patientObject.isPresent() && referral_mdObject.isPresent())
+            if(order.getStatus() == Long.valueOf(2))
             {
-                OrderDTO new_order = new OrderDTO(
-                    order.getId(),
-                    patientObject.get(),
-                    referral_mdObject.get(),
-                    order.getModality(),
-                    order.getNotes(),
-                    order.getStatus(),
-                    order.getReport(),
-                    order.getAppointment());
-    
-                new_order.setId(order.getId());
+                Optional<Patient> find_patient = patientRepository.findById(order.getPatient());
+                if(find_patient.isPresent())
+                {
+                    order.setPatientObject(find_patient.get());
+                }
+                
+                Optional<User> find_referral_md = userRepository.findById(order.getReferral_md());
+                if(find_referral_md.isPresent())
+                {
+                    order.setReferralMDObject(find_referral_md.get());
+                }
+                
+                Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+                if(find_modality.isPresent())
+                {
+                    order.setModalityObject(find_modality.get());
+                }
+                
+                Optional<OrderStatus> find_order_status = orderStatusRepository.findById(order.getStatus());
+                if(find_order_status.isPresent())
+                {
+                    order.setStatusObject(find_order_status.get());
+                }
 
-                complete_imaging_orders_list.add(new_order);
+                complete_imaging_orders_list.add(order);
             }
         }
 
@@ -230,8 +317,38 @@ public class UserController {
     public String getAppointments(Model model) 
     {
         Iterable<Appointment> appointments_list = appointmentRepository.findAll();
+        ArrayList<Appointment> complete_appointments_list = new ArrayList<Appointment>();
 
-        model.addAttribute("appointments_list", appointments_list);
+        for(Appointment appointment : appointments_list)
+        {
+            Optional<Patient> find_patient = patientRepository.findById(appointment.getPatient());
+            if(find_patient.isPresent())
+            {
+                appointment.setPatientObject(find_patient.get());
+            }
+            
+            Optional<Modality> find_modality = modalityRepository.findById(appointment.getModality());
+            if(find_modality.isPresent())
+            {
+                appointment.setModalityObject(find_modality.get());
+            }
+            
+            Optional<User> find_radiologist = userRepository.findById(appointment.getRadiologist());
+            if(find_radiologist.isPresent())
+            {
+                appointment.setRadiologistObject(find_radiologist.get());
+            }
+            
+            Optional<User> find_technician = userRepository.findById(appointment.getTechnician());
+            if(find_technician.isPresent())
+            {
+                appointment.setTechnicianObject(find_technician.get());
+            }
+
+            complete_appointments_list.add(appointment);
+        }
+
+        model.addAttribute("appointments_list", complete_appointments_list);
 
         return "appointments";
     }
@@ -240,33 +357,53 @@ public class UserController {
     public String getOrders(Model model) 
     {
         Iterable<Order> orders = orderRepository.findAll();
-        ArrayList<OrderDTO> orderDTO_list = new ArrayList<OrderDTO>();
+        ArrayList<Order> orders_list = new ArrayList<Order>();
+
         for(Order order : orders)
         {
-            Optional<Patient> patientObject = patientRepository.findById(order.getPatient());
-            Optional<User> referral_mdObject = userRepository.findById(order.getReferral_md());
-
-            if(patientObject.isPresent() && referral_mdObject.isPresent())
+            Optional<Patient> find_patient = patientRepository.findById(order.getPatient());
+            if(find_patient.isPresent())
             {
-                OrderDTO new_order = new OrderDTO(
-                    order.getId(),
-                    patientObject.get(),
-                    referral_mdObject.get(),
-                    order.getModality(),
-                    order.getNotes(),
-                    order.getStatus(),
-                    order.getReport(),
-                    order.getAppointment());
-    
-                new_order.setId(order.getId());
-    
-                orderDTO_list.add(new_order);
+                order.setPatientObject(find_patient.get());
             }
+            
+            Optional<User> find_referral_md = userRepository.findById(order.getReferral_md());
+            if(find_referral_md.isPresent())
+            {
+                order.setReferralMDObject(find_referral_md.get());
+            }
+            
+            Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+            if(find_modality.isPresent())
+            {
+                order.setModalityObject(find_modality.get());
+            }
+            
+            Optional<OrderStatus> find_order_status = orderStatusRepository.findById(order.getStatus());
+            if(find_order_status.isPresent())
+            {
+                order.setStatusObject(find_order_status.get());
+            }
+
+            orders_list.add(order);
+
         }
 
-        model.addAttribute("orders_list", orderDTO_list);
+        model.addAttribute("orders_list", orders_list);
 
         return "orders";
+    }
+
+    @GetMapping("/download/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
+
+        Resource resource = storageService.loadAsResource(filename);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
     }
 
     @GetMapping("/login")

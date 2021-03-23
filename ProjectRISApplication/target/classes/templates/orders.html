@@ -14,11 +14,19 @@
     <script>
         $(document).ready(function(){
             
+            $('body').on('click', '.orderViewButton', function(){
+                window.location="/referral/order/" + $(this).parents('tr').data('order');
+            });
+
             $('#OrderTable').dataTable({
                 "bPaginate": false,
                 "bFilter": true,
                 "bInfo": false,
-                "bAutoWidth": false }
+                "bAutoWidth": false,
+                "columnDefs": [
+                    {"visible" : false,
+                     "targets" : [0, 2, 6]}
+                ]}
             );
         });
     </script>
@@ -83,13 +91,13 @@
                                 data-modality=${order.getModality()}
                                 ">
                                     <td th:text="${order.getId()}">-1</td>
-                                    <td th:text="${order.getPatient()}">-1</td>
-                                    <td th:text="${order.getReferral_md()}">-1</td>
-                                    <td th:text="${order.getModality()}">-1</td>
+                                    <td th:text="${order.getPatientObject().getLast_name()} + ', ' + ${order.getPatientObject().getFirst_name}" >-1</td>
+                                    <td th:text="${order.getReferralMDObject().getFull_name()}">-1</td>
+                                    <td th:text="${order.getModalityObject().getName()}">-1</td>
                                     <td th:text="${order.getNotes()}">-1</td>
-                                    <td th:text="${order.getStatus()}">-1</td>
+                                    <td th:text="${order.getStatusObject().getName()}">-1</td>
                                     <td th:text="${order.getReport()}">-1</td>
-                                    <td></td>
+                                    <td><p class="view-a orderViewButton">View</p></td>
                                 </tr>
                             </tbody>
                         </table>

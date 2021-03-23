@@ -29,6 +29,14 @@ public class Appointment {
     private String date;
     @Transient
     private String time;
+    @Transient
+    private Patient patientObject;
+    @Transient
+    private Modality modalityObject;
+    @Transient
+    private User radiologistObject;
+    @Transient
+    private User technicianObject;
 
 
 
@@ -86,6 +94,22 @@ public class Appointment {
         return this.closed;
     }
 
+    public Patient getPatientObject(){
+        return this.patientObject;
+    }
+
+    public Modality getModalityObject(){
+        return this.modalityObject;
+    }
+
+    public User getRadiologistObject(){
+        return this.radiologistObject;
+    }
+
+    public User getTechnicianObject(){
+        return this.technicianObject;
+    }
+
 
     //  SETTERS
 
@@ -139,6 +163,22 @@ public class Appointment {
 
     public void setClosed(int closed){
         this.closed = closed;
+    }
+
+    public void setPatientObject(Patient patientObject){
+        this.patientObject = patientObject;
+    }
+
+    public void setModalityObject(Modality modalityObject){
+        this.modalityObject = modalityObject;
+    }
+
+    public void setRadiologistObject(User radiologistObject){
+        this.radiologistObject = radiologistObject;
+    }
+
+    public void setTechnicianObject(User technicianObject){
+        this.technicianObject = technicianObject;
     }
 
 
