@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import java.util.ArrayList;
 
+import com.example.application.persistence.Patient;
 import com.example.application.persistence.User;
 import com.example.application.persistence.UsersRoles;
 import com.example.application.persistence.UsersRolesList;
@@ -52,6 +53,7 @@ public class AdminController {
         model.addAttribute("patients_list", patientRepository.findAll());
         model.addAttribute("orders_list", orderRepository.findAll());
         model.addAttribute("user", new User());
+        model.addAttribute("patient", new Patient());
         return "admin_dashboard";
     }
 

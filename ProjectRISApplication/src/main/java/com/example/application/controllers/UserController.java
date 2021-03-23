@@ -140,7 +140,6 @@ public class UserController {
         {
             for(Role role : user.getRoles())
             {
-                System.out.println(role.getName());
                 if(role.getRole_id() == 6)          //  Is user a Radiologist
                 {
                     radiologists.add(user);
@@ -222,14 +221,6 @@ public class UserController {
         }
 
         model.addAttribute("complete_imaging_orders_list", complete_imaging_orders_list);
-
-
-
-
-
-
-
-
 
 
         return "home";

@@ -108,11 +108,11 @@
                     <h3>Diagnostic Report</h3>
                     <hr>
                     <form method="POST" th:action="@{/diagnostics/submitReport}">
-                        <input type="hidden" id="ImagingCompleteOrderIdInput" th:field="${order.id}">
-                        <input type="hidden" id="ImagingCompleteOrderIdInput" th:field="${order.id}">
+                        <input type="hidden" id="DiagnosticReportPatientInput" th:field="${diagnostics.patient}">
+                        <input type="hidden" id="DiagnosticReportOrderInput" th:field="${diagnostics.order}">
                         <div class="row">
                             <div class="col-sm-12 pad-input">
-                                <textarea class="form-control"></textarea>
+                                <textarea class="form-control" th:field="${diagnostics.notes}"></textarea>
                             </div>
                         </div>
                         <br>

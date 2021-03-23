@@ -9,59 +9,54 @@ public class DiagnosticReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long report;
+    @Column(name = "order_id")
+    private Long order;
     private Long patient;
     private Long radiologist;
-    private Long appointment;
-    @Column(name = "imaging_info")
-    private Long imaging;
     private String notes;
 
-    public void setReport(Long report) {
-        this.report = report;
+    //  GETTERS
+
+    public Long getOrder() {
+        return this.order;
     }
 
-    public Long getReport() {
-        return this.report;
-    }
-    public void setPatient(Long patient) {
-        this.patient = patient;
+    public Long getId() {
+        return this.id;
     }
 
     public Long getPatient() {
         return this.patient;
     }
 
-    public void setRadiologist(Long radiologist) {
-        this.radiologist = radiologist;
-    }
-
     public Long getRadiologist() {
         return this.radiologist;
     }
 
-    public void setAppointment(Long appointment) {
-        this.appointment = appointment;
+    public String getNotes() {
+        return this.notes;
     }
 
-    public Long getAppointment() {
-        return this.appointment;
+    //  SETTERS
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setImaging(Long imaging) {
-        this.imaging = imaging;
+    public void setOrder(Long order) {
+        this.order = order;
+    }
+    
+    public void setPatient(Long patient) {
+        this.patient = patient;
     }
 
-    public Long getImaging() {
-        return this.imaging;
+    public void setRadiologist(Long radiologist) {
+        this.radiologist = radiologist;
     }
 
     public void setNotes(String notes) {
         this.notes = notes;
-    }
-
-    public String getNotes() {
-        return this.notes;
     }
 
 }
