@@ -246,28 +246,13 @@
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
                     Logout
                 </div>
+                <div class="sn-navbar-user" style="float:right;">
+                    Logged in: <span sec:authentication="name">Username</span>
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-12 panel">
-                <div class="inset-panel">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <center>
-                                <h1>Logged in</h1>
-            
-                                <div sec:authorize="isAuthenticated()">
-                                    <p>Welcome <b><span sec:authentication="name">Username</span></b></p>
-                                    <p><i><span sec:authentication="principal.authorities">Roles</span></i></p>
-                                </div>
-            
-                                <div sec:authorize="hasAuthority('USER')">
-                                    <p><b>Contact your system admin to be assigned a system role.</b></p>
-                                </div>
-                            </center>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="inset-panel" sec:authorize="hasAnyAuthority('ADMIN', 'REFERRAL_DOCTOR')">
                     <div class="row">

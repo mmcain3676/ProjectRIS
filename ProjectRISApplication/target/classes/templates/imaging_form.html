@@ -180,7 +180,7 @@
                 <div class="inset-panel">
                     <div class="row">
                         <div class="col-sm-12">
-                            <center><h3>Diagnostic Report</h3></center>
+                            <center><h3>Imaging Order</h3></center>
                         </div>
                     </div>
                     <br>
@@ -214,33 +214,35 @@
                         </div>
                     </div>
                     <br>
-                    <h3>Imaging Order</h3>
+                    <h3>Imaging</h3>
                     <hr>
-                    <div class="row">
-                        <div class="col-sm-12 pad-input">
-                            <label>Uploaded Images:</label>
-                            <ul>
-                                <li th:each="file_upload: ${file_uploads_list}"><p class="view-a btn-file" style="float:none;" th:attr="data-file=${file_upload.getFilename()}" th:text="${file_upload.getFilename()}"></p></li>
-                            </ul>
-                        </div>
-                        <div class="col-sm-4 pad-input">
-                        </div>
-                    </div>
-                    <br>
-                    <h3>Diagnostic Report</h3>
-                    <hr>
-                    <form method="POST" th:action="@{/diagnostics/submitReport}" th:object="${diagnostics}">
-                        <input type="hidden" id="DiagnosticReportPatientInput" th:field="*{patient}">
-                        <input type="hidden" id="DiagnosticReportOrderInput" th:field="*{order}">
+                    
+                    <form enctype="multipart/form-data" method="POST" th:action="@{/imaging/upload-file}">
+                        <input type="hidden" id="ImagingUploadOrderIdInput" th:field="${order.id}">
                         <div class="row">
+                            <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
+                            <div class="col-sm-3 pad-input">
+                                <input type="file" name="file" class="form-control-file">
+                            </div>
+                            <div class="col-sm-9 pad-input">
+                                <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+                            </div>
                             <div class="col-sm-12 pad-input">
-                                <textarea class="form-control" th:field="*{diagnostic}"></textarea>
+                                <label>Uploaded Images:</label>
+                                <ul>
+                                    <li th:each="file_upload: ${file_uploads_list}"><p class="view-a btn-file" style="float:none;" th:attr="data-file=${file_upload.getFilename()}" th:text="${file_upload.getFilename()}"></p></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-4 pad-input">
                             </div>
                         </div>
-                        <br>
+                    </form>
+                    <br>
+                    <form method="POST" th:action="@{/imaging/completeOrder}">
                         <div class="row">
+                            <input type="hidden" id="ImagingCompleteOrderIdInput" th:field="${order.id}">
                             <div class="col-sm-11">
-                                <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Complete Report"/>
+                                <input type="submit" class="btn btn-md btn-primary submitOrderButton" style="float:right; padding-right: 10px;" value="Complete Order"/>
                             </div>
                             <div class="col-sm-1">
                                 <input type="button" class="btn btn-md btn-danger" style="float:right;" value="Back" onclick="window.location='/home'"/>
@@ -248,6 +250,7 @@
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

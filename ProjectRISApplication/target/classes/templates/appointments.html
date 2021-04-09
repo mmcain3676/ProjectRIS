@@ -48,6 +48,9 @@
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
                     Logout
                 </div>
+                <div class="sn-navbar-user" style="float:right;">
+                    Logged in: <span sec:authentication="name">Username</span>
+                </div>
             </div>
         </div>
         <div class="row">

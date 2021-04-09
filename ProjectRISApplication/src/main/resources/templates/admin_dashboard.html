@@ -15,8 +15,17 @@
     
 
     <link rel="stylesheet" href="/css/styles.css">
-    <script>
+
+
+
+
+    <script th:inline="javascript">
         $(document).ready(function(){            
+            
+            $('.patient-alert-div').each(function(index, val){
+                $(val).find('.alert-id-input').attr('name', 'patients_alerts[' + index + '].alert_id');
+                $(val).find('.alert-value-input').attr('name', 'patients_alerts[' + index + '].alert_value');
+            });
 
             var roleRowIndex = 0;
 
@@ -175,6 +184,62 @@
                     }
                 }
             });
+    
+            $('body').on('click', '.modalityCreateButton', function(){
+                $('.modal-tile, #ModalityWarning').hide();
+                $('.modal, #ModifyModalityModal').show();
+                $("body").toggleClass("dialogIsOpen");
+
+                $('.form-control').attr('disabled', false);
+                $('.form-control').val('');
+
+                $('#ModalityModalTitle').html('Create New Modality')
+            });
+            
+            $('body').on('click', '.modalityModifyButton', function(){
+                $('.modal-tile, #ModalityWarning').hide();
+                $('.modal, #ModifyModalityModal').show();
+                $("body").toggleClass("dialogIsOpen");
+                $('.form-control').val('');
+
+                var modalityRow = $(this).parents('tr');
+
+                $('option').attr('selected', false);
+
+                $('.form-control').attr('disabled', false);
+                $('#ModalityIdInput').val($(modalityRow).data('id'));
+                $('#ModalityNameInput').val($(modalityRow).data('name'));
+
+                $('#ModalityModalTitle').html('Modality Overview')
+            });
+ 
+            $('body').on('click', '.patientAlertCreateButton', function(){
+                $('.modal-tile, #PatientAlertWarning').hide();
+                $('.modal, #ModifyPatientAlertModal').show();
+                $("body").toggleClass("dialogIsOpen");
+
+                $('.form-control').attr('disabled', false);
+                $('.form-control').val('');
+
+                $('#PatientAlertModalTitle').html('Create New Patient Alert')
+            });
+
+            $('body').on('click', '.patientAlertModifyButton', function(){
+                $('.modal-tile, #PatientAlertWarning').hide();
+                $('.modal, #ModifyPatientAlertModal').show();
+                $("body").toggleClass("dialogIsOpen");
+                $('.form-control').val('');
+
+                var patientAlertRow = $(this).parents('tr');
+
+                $('option').attr('selected', false);
+
+                $('.form-control').attr('disabled', false);
+                $('#PatientAlertIdInput').val($(patientAlertRow).data('id'));
+                $('#PatientAlertNameInput').val($(patientAlertRow).data('name'));
+
+                $('#PatientAlertModalTitle').html('Patient Alert Overview')
+            });
 
             $('body').on('click', '.patientCreateButton', function(){
                 $('.modal-tile, #PatientWarning').hide();
@@ -183,6 +248,7 @@
 
                 $('.form-control').attr('disabled', false);
                 $('.form-control').val('');
+                $('.alert-value-input').val(0);
                 $('#PatientIdInput').val('');
 
                 $('#PatientModalTitle').html('Create New Patient')
@@ -197,6 +263,17 @@
                 var patientRow = $(this).parents('tr');
 
                 $('option').attr('selected', false);
+
+                $('.alert-value-input').val(0);
+
+                $('.alert-value-input').each(function(inputIndex, inputValue){
+                    $(patientRow).find('.alert-info').each(function(alertIndex, alertValue){
+                        if($(inputValue).data('id') == $(alertValue).find('.alert-info-id').val())
+                        {
+                            $(inputValue).val($(alertValue).find('.alert-info-value').val())
+                        }
+                    });
+                });
 
                 $('.form-control').attr('disabled', false);
                 $('#PatientIdInput').val($(patientRow).data('id'));
@@ -354,7 +431,7 @@
                 dateFormat: 'yy-mm-dd'
             });
             
-            $('#UserTable, #PatientTable, #OrderTable, #AppointmentTable, #FileUploadTable, #DiagnosticReportTable').dataTable({
+            $('#UserTable, #ModalityTable, #PatientAlertTable, #PatientTable, #OrderTable, #AppointmentTable, #FileUploadTable, #DiagnosticReportTable').dataTable({
                 "bPaginate": false,
                 "bFilter": true,
                 "bInfo": false,
@@ -471,6 +548,82 @@
 
         <div class="container">
             <div class="row">
+                <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyModalityModal">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 id="ModalityModalTitle">Create New Modality</h1>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="ModalityWarning" style="display: none; font-weight: bold;">
+                        <div class="col-sm-12 alert alert-danger" id="ModalityWarningContent">
+                        </div>
+                    </div>
+                    <br>
+                    <form action="#" th:action="@{/admin/updateModality}" method="post">
+                        <input type="hidden" id="ModalityIdInput" th:field="${modality.id}">
+                        <div style="overflow-y: auto; max-height: 400px; overflow-x: hidden; padding: 10px;">
+                            <div class="row">
+                                <div class="col-sm-4 pad-input">
+                                    <label for="ModalityNameInput">Modality Name:</label>
+                                    <input type="text" class="form-control" id="ModalityNameInput" th:field="${modality.name}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="submit" class="btn btn-md btn-primary saveModalityButton" style="float:right; padding-right: 10px;" value="Save Modality"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyPatientAlertModal">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h1 id="PatientAlertModalTitle">Create New Patient Alert</h1>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="PatientAlertWarning" style="display: none; font-weight: bold;">
+                        <div class="col-sm-12 alert alert-danger" id="PatientAlertWarningContent">
+                        </div>
+                    </div>
+                    <br>
+                    <form action="#" th:action="@{/admin/updatePatientAlert}" method="post">
+                        <input type="hidden" id="PatientAlertIdInput" th:field="${alert.id}">
+                        <div style="overflow-y: auto; max-height: 400px; overflow-x: hidden; padding: 10px;">
+                            <div class="row">
+                                <div class="col-sm-6 pad-input">
+                                    <label for="PatientAlertNameInput">Patient Alert Name:</label>
+                                    <input type="text" class="form-control" id="PatientAlertNameInput" th:field="${alert.name}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="submit" class="btn btn-md btn-primary savePatientAlertButton" style="float:right; padding-right: 10px;" value="Save Patient Alert"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="button" class="btn btn-md btn-danger close-modal" style="float:right;" value="Cancel"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
                 <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyPatientModal">
                     <div class="row">
                         <div class="col-sm-12">
@@ -531,32 +684,13 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <hr>
-                                    <div id="PatientAlerts">
-                                        <div class="pad-input">
-                                            <label for="LatexAlergy">Allergy to Latex</label>
-                                            <select class="form-control">
-                                                <option value="0">No</option>
-                                                <option value="1">Yes</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div id="PatientAlerts">
-                                        <div class="pad-input">
-                                            <label for="LatexAlergy">Allergy to Blood Thinners</label>
-                                            <select class="form-control">
-                                                <option value="0">No</option>
-                                                <option value="1">Yes</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div id="PatientAlerts">
-                                        <div class="pad-input">
-                                            <label for="LatexAlergy">Allergy to Dyes Which May Be Used In Imaging</label>
-                                            <select class="form-control">
-                                                <option value="0">No</option>
-                                                <option value="1">Yes</option>
-                                            </select>
-                                        </div>
+                                    <div class="patient-alert-div" th:each="alert : ${patient_alerts_list}" style="margin-bottom:20px;" th:attr="data-id=${alert.getId()}">
+                                        <input class="alert-id-input" type="hidden" th:value="${alert.getId()}">
+                                        <label th:text="${alert.getName()}"></label>
+                                        <select class="form-control alert-value-input" th:attr="data-id=${alert.getId()}">
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -637,7 +771,6 @@
             </div>
         </div>
 
-        
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 modal-tile" style="display: none; top: 50%; transform: translateY(-50%);" id="ModifyAppointmentModal">
@@ -884,6 +1017,9 @@
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
                     Logout
                 </div>
+                <div class="sn-navbar-user" style="float:right;">
+                    Logged in: <span sec:authentication="name">Username</span>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -928,6 +1064,66 @@
                     <div class="row">
                         <div class="col-sm-4"><p></p></div>
                         <div class="col-sm-4">
+                            <center><h3>Modalities</h3></center>
+                        </div>
+                        <div class="col-sm-4">
+                            <p class="view-a modalityCreateButton" style="font-size: 24px; float:right;">New</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <br>
+                    <table id="ModalityTable" class="display">
+                        <thead>
+                            <tr>
+                                <th>Modality ID</th>
+                                <th>Modality</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="modality : ${modalities_list}" th:attr="data-id=${modality.getId()}, data-name=${modality.getName()}">
+                                <td th:text="${modality.getId()}">-1</td>
+                                <td th:text="${modality.getName()}">No Name</td>
+                                <td><p class="view-a modalityModifyButton">Modify</p></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inset-panel">
+                    <div class="row">
+                        <div class="col-sm-4"><p></p></div>
+                        <div class="col-sm-4">
+                            <center><h3>Patient Alerts</h3></center>
+                        </div>
+                        <div class="col-sm-4">
+                            <p class="view-a patientAlertCreateButton" style="font-size: 24px; float:right;">New</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <br>
+                    <table id="PatientAlertTable" class="display">
+                        <thead>
+                            <tr>
+                                <th>Patient Alert ID</th>
+                                <th>Patient Alert</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="alert : ${patient_alerts_list}" th:attr="data-id=${alert.getId()}, data-name=${alert.getName()}">
+                                <td th:text="${alert.getId()}">-1</td>
+                                <td th:text="${alert.getName()}">No Name</td>
+                                <td><p class="view-a patientAlertModifyButton">Modify</p></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inset-panel">
+                    <div class="row">
+                        <div class="col-sm-4"><p></p></div>
+                        <div class="col-sm-4">
                             <center><h3>Patients</h3></center>
                         </div>
                         <div class="col-sm-4">
@@ -961,7 +1157,15 @@
                                     <td th:text="${patient.getDob()}">1970-01-01</td>
                                     <td th:text="${patient.getLast_name()}">Demo_last</td>
                                     <td th:text="${patient.getFirst_name()}">Demo_first</td>
-                                    <td><p class="view-a patientModifyButton">Modify</p></td>
+                                    <td>
+                                        <p class="view-a patientModifyButton">Modify</p>
+                                        <div class="patient-alerts-table-div" hidden>
+                                            <div class="alert-info" th:each="alert : ${patient.getAlerts()}">
+                                                <input type="hidden" class="alert-info-id" th:value="${alert.getAlert_id()}"/>
+                                                <input type="hidden" class="alert-info-value" th:value="${alert.getAlert_value()}"/>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

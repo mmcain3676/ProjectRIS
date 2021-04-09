@@ -1,5 +1,6 @@
 package com.example.application.persistence;
 
+
 import javax.persistence.*;
  
 @Entity
@@ -16,6 +17,9 @@ public class Patient {
     private String sex;
     private String race;
     private String ethnicity;
+
+    @Transient
+    private Iterable<PatientsAlerts> alerts;
 
     public Long getId() {
         return this.id;
@@ -43,6 +47,10 @@ public class Patient {
 
     public String getEthnicity(){
         return this.ethnicity;
+    }
+
+    public Iterable<PatientsAlerts> getAlerts(){
+        return this.alerts;
     }
 
 
@@ -74,6 +82,10 @@ public class Patient {
 
     public void setEthnicity(String ethnicity){
         this.ethnicity = ethnicity;
+    }
+
+    public void setAlerts(Iterable<PatientsAlerts> iterable){
+        this.alerts = iterable;
     }
 
 

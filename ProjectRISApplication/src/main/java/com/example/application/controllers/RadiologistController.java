@@ -20,12 +20,14 @@ import com.example.application.persistence.Modality;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.Patient;
 import com.example.application.persistence.PatientAlertsList;
+import com.example.application.repositories.AlertRepository;
 import com.example.application.repositories.AppointmentRepository;
 import com.example.application.repositories.DiagnosticRepository;
 import com.example.application.repositories.FileUploadRepository;
 import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.PatientRepository;
+import com.example.application.repositories.PatientsAlertsRepository;
 import com.example.application.security.AppUserDetails;
 
 @Controller 
@@ -44,6 +46,10 @@ public class RadiologistController {
     private AppointmentRepository appointmentRepository;
     @Autowired
     private ModalityRepository modalityRepository;
+    @Autowired
+    private AlertRepository alertRepository;
+    @Autowired
+    private PatientsAlertsRepository patientsAlertsRepository;
 
     @PostMapping("/updatePatient")
     public String updatePatient(@ModelAttribute("patient") Patient patient, @ModelAttribute("alerts") PatientAlertsList alerts, Model model, BindingResult result)
@@ -82,10 +88,12 @@ public class RadiologistController {
                 }
 
                 Patient patient = get_patient.get();
+                patient.setAlerts(patientsAlertsRepository.findByPatient(patient.getId()));
 
                 model.addAttribute("order", order);
                 model.addAttribute("patient", patient);
                 model.addAttribute("file_uploads_list", fileUploadRepository.getAllFileUploadsByOrderId(order.getId()));
+                model.addAttribute("patient_alerts_list", alertRepository.findAll());
                 DiagnosticReport diagnosticReport = new DiagnosticReport();
                 diagnosticReport.setOrder(order.getId());
                 diagnosticReport.setPatient(patient.getId());

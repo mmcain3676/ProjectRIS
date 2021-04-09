@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.OrderStatus;
 import com.example.application.persistence.Patient;
+import com.example.application.persistence.Alert;
 import com.example.application.persistence.PatientAlertsList;
+import com.example.application.persistence.PatientsAlerts;
 import com.example.application.persistence.Role;
 import com.example.application.persistence.User;
 import com.example.application.persistence.UsersRoles;
@@ -39,7 +41,9 @@ import com.example.application.repositories.FileUploadRepository;
 import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.OrderStatusRepository;
+import com.example.application.repositories.AlertRepository;
 import com.example.application.repositories.PatientRepository;
+import com.example.application.repositories.PatientsAlertsRepository;
 import com.example.application.repositories.RoleRepository;
 import com.example.application.repositories.UserRepository;
 import com.example.application.repositories.UsersRolesRepository;
@@ -67,6 +71,10 @@ public class AdminController {
     private DiagnosticRepository diagnosticRepository;
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private AlertRepository alertRepository;
+    @Autowired
+    private PatientsAlertsRepository patientsAlertsRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -221,7 +229,6 @@ public class AdminController {
                 else
                     time += "pm";
                 appointment.setTime(time);
-                System.out.println(appointment.getTime());
             }
 
             complete_appointments_list.add(appointment);
@@ -278,6 +285,12 @@ public class AdminController {
             }
         }
 
+        Iterable<Patient> patients_list = patientRepository.findAll();
+        for(Patient patient : patients_list)
+        {
+            patient.setAlerts(patientsAlertsRepository.findByPatient(patient.getId()));
+        }
+
 
         model.addAttribute("roles", rolesList);
         model.addAttribute("users_list", userRepository.findAll());
@@ -301,6 +314,9 @@ public class AdminController {
         model.addAttribute("unscheduled_orders_list", unscheduled_orders_list);
         model.addAttribute("times_list", times_list);
         model.addAttribute("technicians_list", technicianList);
+        model.addAttribute("modality", new Modality());
+        model.addAttribute("alert", new Alert());
+        model.addAttribute("patient_alerts_list", alertRepository.findAll());
         
         return "admin_dashboard";
     }
@@ -336,7 +352,6 @@ public class AdminController {
 
             if(users_roles.getUsers_roles() == null)      // If no role is passed, create a default user (2) role
             {
-                System.out.println("No role, adding user");
                 UsersRoles default_user = new UsersRoles();
                 default_user.setUserid(user.getUser_id());
                 default_user.setRole_id(Long.valueOf(2));
@@ -358,9 +373,37 @@ public class AdminController {
         return "redirect:dashboard";
     }
 
-    @PostMapping("/updatePatient")
-    public String updatePatient(@ModelAttribute("patient") Patient patient, @ModelAttribute("alerts") PatientAlertsList alerts, Model model, BindingResult result)
+    @PostMapping("/updateModality")
+    public String updateModality(@ModelAttribute("modality") Modality modality, Model model, BindingResult result)
     {
+        modalityRepository.save(modality);
+
+        return "redirect:/admin/dashboard";
+    }
+
+    @PostMapping("/updatePatientAlert")
+    public String updatePatientAlert(@ModelAttribute("alert") Alert alert, Model model, BindingResult result)
+    {
+        System.out.println(alert.getName());
+        alertRepository.save(alert);
+
+        return "redirect:/admin/dashboard";
+    }
+
+    @PostMapping("/updatePatient")
+    public String updatePatient(@ModelAttribute("patient") Patient patient, @ModelAttribute("patients_alerts") PatientAlertsList patients_alerts, Model model, BindingResult result)
+    {
+        if(patient.getId() != null && patient.getId() > 0)
+        {
+            patientsAlertsRepository.deleteByPatient(patient.getId());
+        }
+
+        for(PatientsAlerts alert : patients_alerts.getPatients_alerts())
+        {
+            alert.setPatient(patient.getId());
+            patientsAlertsRepository.save(alert);
+        }
+
         patientRepository.save(patient);
 
         return "redirect:/admin/dashboard";
@@ -441,7 +484,6 @@ public class AdminController {
     public String updateDiagnosticReport(@ModelAttribute("diagnostic_report") DiagnosticReport diagnosticReport, Model model, BindingResult result)
     {
         diagnosticRepository.save(diagnosticReport);
-        System.out.println(diagnosticReport);
 
         return "redirect:/admin/dashboard";
     }

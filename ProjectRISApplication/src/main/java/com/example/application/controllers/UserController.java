@@ -31,6 +31,7 @@ import com.example.application.persistence.OrderStatus;
 import com.example.application.persistence.Patient;
 import com.example.application.persistence.Role;
 import com.example.application.persistence.User;
+import com.example.application.repositories.AlertRepository;
 import com.example.application.repositories.AppointmentRepository;
 import com.example.application.repositories.DiagnosticRepository;
 import com.example.application.repositories.FileUploadRepository;
@@ -38,6 +39,7 @@ import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.OrderStatusRepository;
 import com.example.application.repositories.PatientRepository;
+import com.example.application.repositories.PatientsAlertsRepository;
 import com.example.application.repositories.UserRepository;
 import com.example.application.security.AppUserDetails;
 
@@ -60,6 +62,10 @@ public class UserController {
     private FileUploadRepository fileUploadRepository;
     @Autowired
     private DiagnosticRepository diagnosticRepository;
+    @Autowired
+    private PatientsAlertsRepository patientsAlertsRepository;
+    @Autowired
+    private AlertRepository alertRepository;
     
     private StorageService storageService;
 
@@ -425,6 +431,7 @@ public class UserController {
             if(find_patient.isPresent())
             {
                 Patient patient = find_patient.get();
+                patient.setAlerts(patientsAlertsRepository.findByPatient(patient.getId()));
 
                 model.addAttribute("patient", patient);
             }
@@ -446,6 +453,8 @@ public class UserController {
             {
                 model.addAttribute("diagnostics", diagnostics);
             }
+
+            model.addAttribute("patient_alerts_list", alertRepository.findAll());
         }
 
         return "order_overview";

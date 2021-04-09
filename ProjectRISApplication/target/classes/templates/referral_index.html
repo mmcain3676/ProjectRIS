@@ -16,6 +16,11 @@
     <script>
         $(document).ready(function(){
             
+            $('.patient-alert-div').each(function(index, val){
+                $(val).find('.alert-id-input').attr('name', 'patients_alerts[' + index + '].alert_id');
+                $(val).find('.alert-value-input').attr('name', 'patients_alerts[' + index + '].alert_value');
+            });
+
             $('body').on('click', '.patientCreateButton', function(){
                 $('.modal-tile, #PatientWarning').hide();
                 $('.modal, #ModifyPatientModal').show();
@@ -24,6 +29,7 @@
                 $('.form-control').attr('disabled', false);
                 $('.form-control').val('');
                 $('#PatientIdInput').val('');
+                $('.alert-value-input').val(0);
 
                 $('#PatientModalTitle').html('Create New Patient')
             });
@@ -35,6 +41,18 @@
                 $('.form-control').val('');
 
                 var patientRow = $(this).parents('tr');
+
+                
+                $('.alert-value-input').val(0);
+
+                $('.alert-value-input').each(function(inputIndex, inputValue){
+                    $(patientRow).find('.alert-info').each(function(alertIndex, alertValue){
+                        if($(inputValue).data('id') == $(alertValue).find('.alert-info-id').val())
+                        {
+                            $(inputValue).val($(alertValue).find('.alert-info-value').val())
+                        }
+                    });
+                });
 
                 $('.form-control').attr('disabled', true);
                 $('#PatientIdInput').val($(patientRow).data('id'));
@@ -83,6 +101,7 @@
 </head>
 <body>
     
+<div style="padding-left: calc(100vw - 100%);">
     <div class="modal" style="display: none;">
         <div class="container">
             <div class="row">
@@ -146,32 +165,13 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <hr>
-                                    <div id="PatientAlerts">
-                                        <div class="pad-input">
-                                            <label for="LatexAlergy">Allergy to Latex</label>
-                                            <select class="form-control">
-                                                <option value="0">No</option>
-                                                <option value="1">Yes</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div id="PatientAlerts">
-                                        <div class="pad-input">
-                                            <label for="LatexAlergy">Allergy to Blood Thinners</label>
-                                            <select class="form-control">
-                                                <option value="0">No</option>
-                                                <option value="1">Yes</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div id="PatientAlerts">
-                                        <div class="pad-input">
-                                            <label for="LatexAlergy">Allergy to Dyes Which May Be Used In Imaging</label>
-                                            <select class="form-control">
-                                                <option value="0">No</option>
-                                                <option value="1">Yes</option>
-                                            </select>
-                                        </div>
+                                    <div class="patient-alert-div" th:each="alert : ${patient_alerts_list}" style="margin-bottom:20px;" th:attr="data-id=${alert.getId()}">
+                                        <input class="alert-id-input" type="hidden" th:value="${alert.getId()}">
+                                        <label th:text="${alert.getName()}"></label>
+                                        <select class="form-control alert-value-input" th:attr="data-id=${alert.getId()}">
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -210,6 +210,9 @@
                 </div>
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
                     Logout
+                </div>
+                <div class="sn-navbar-user" style="float:right;">
+                    Logged in: <span sec:authentication="name">Username</span>
                 </div>
             </div>
         </div>
@@ -252,7 +255,15 @@
                                     <td th:text="${patient.getDob()}">1970-01-01</td>
                                     <td th:text="${patient.getLast_name()}">Demo_last</td>
                                     <td th:text="${patient.getFirst_name()}">Demo_first</td>
-                                    <td><p class="view-a patientSelectButton">Select</p></td>
+                                    <td>
+                                        <p class="view-a patientSelectButton">Select</p>
+                                        <div class="patient-alerts-table-div" hidden>
+                                            <div class="alert-info" th:each="alert : ${patient.getAlerts()}">
+                                                <input type="hidden" class="alert-info-id" th:value="${alert.getAlert_id()}"/>
+                                                <input type="hidden" class="alert-info-value" th:value="${alert.getAlert_value()}"/>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -261,5 +272,6 @@
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>

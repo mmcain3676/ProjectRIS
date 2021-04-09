@@ -7,10 +7,12 @@ import com.example.application.persistence.FileUpload;
 import com.example.application.persistence.Modality;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.Patient;
+import com.example.application.repositories.AlertRepository;
 import com.example.application.repositories.FileUploadRepository;
 import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.PatientRepository;
+import com.example.application.repositories.PatientsAlertsRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,10 @@ public class TechnicianController {
     private FileUploadRepository fileUploadRepository;
     @Autowired
     private ModalityRepository modalityRepository;
+    @Autowired
+    private AlertRepository alertRepository;
+    @Autowired
+    private PatientsAlertsRepository patientsAlertsRepository;
 
     private StorageService storageService;
 
@@ -64,11 +70,13 @@ public class TechnicianController {
 
 
                 Patient patient = get_patient.get();
+                patient.setAlerts(patientsAlertsRepository.findByPatient(patient.getId()));
 
                 model.addAttribute("order", order);
                 model.addAttribute("patient", patient);
                 model.addAttribute("file_uploads_list", fileUploadRepository.getAllFileUploadsByOrderId(order.getId()));
-                return "imaging_order";
+                model.addAttribute("patient_alerts_list", alertRepository.findAll());
+                return "imaging_form";
             }
         }
         return "redirect:/home";

@@ -32,6 +32,7 @@
     </script>
 </head>
 <body>
+<div style="padding-left: calc(100vw - 100%);">
     <div class="container">
         <div class="row"> <!--      NAVBAR      -->
             <div class="col-sm-12 sn-navbar">
@@ -52,6 +53,9 @@
                 </div>
                 <div class="sn-navbar-btn" style="float:right;" onclick="window.location='/user_logout'">
                     Logout
+                </div>
+                <div class="sn-navbar-user" style="float:right;">
+                    Logged in: <span sec:authentication="name">Username</span>
                 </div>
             </div>
         </div>
@@ -107,5 +111,6 @@
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>
