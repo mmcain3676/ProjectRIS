@@ -41,9 +41,9 @@
                 $('#PatientFirstNameInput').val($(patientRow).data('first_name'));
                 $('#PatientLastNameInput').val($(patientRow).data('last_name'));
                 $('#PatientDOBInput').val($(patientRow).data('dob'));
-                $('#PatientSexInput option[value="' + $(patientRow).data('sex') +'"]').attr('selected', true);
-                $('#PatientRaceInput option[value="' + $(patientRow).data('race') +'"]').attr('selected', true);
-                $('#PatientEthnicityInput option[value="' + $(patientRow).data('ethnicity') +'"]').attr('selected', true);
+                $('#PatientSexInput').val($(patientRow).data('sex'));
+                $('#PatientRaceInput').val($(patientRow).data('race'));
+                $('#PatientEthnicityInput').val($(patientRow).data('ethnicity'));
 
                 $('#PatientModalTitle').html('Patient Overview')
             });

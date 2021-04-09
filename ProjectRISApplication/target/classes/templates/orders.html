@@ -15,7 +15,7 @@
         $(document).ready(function(){
             
             $('body').on('click', '.orderViewButton', function(){
-                window.location="/referral/order/" + $(this).parents('tr').data('order');
+                window.location="/order/" + $(this).parents('tr').data('order');
             });
 
             $('#OrderTable').dataTable({

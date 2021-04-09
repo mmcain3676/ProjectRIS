@@ -15,6 +15,9 @@ public class DiagnosticReport {
     private Long radiologist;
     private String diagnostic;
 
+    @Transient
+    private User radiologistObject;
+
     //  GETTERS
 
     public Long getOrder() {
@@ -37,6 +40,10 @@ public class DiagnosticReport {
         return this.diagnostic;
     }
 
+    public User getRadiologistObject(){
+        return this.radiologistObject;
+    }
+
     //  SETTERS
 
     public void setId(Long id) {
@@ -57,6 +64,10 @@ public class DiagnosticReport {
 
     public void setDiagnostic(String diagnostic) {
         this.diagnostic = diagnostic;
+    }
+
+    public void setRadiologistObject(User radiologistObject){
+        this.radiologistObject = radiologistObject;
     }
 
 }

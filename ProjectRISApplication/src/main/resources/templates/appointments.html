@@ -14,12 +14,15 @@
     <script>
         $(document).ready(function(){
             
-            $('#AppointmentTable, #TodaysAppointmentTable, #CheckedInAppointmentTable').dataTable({
+            $('#AppointmentTable').dataTable({
                 "bPaginate": false,
                 "bFilter": true,
                 "bInfo": false,
-                "bAutoWidth": false }
-            );
+                "bAutoWidth": false,
+                "columnDefs": [
+                    {"visible" : false,
+                     "targets" : [0]}]
+            });
         });
     </script>
 </head>

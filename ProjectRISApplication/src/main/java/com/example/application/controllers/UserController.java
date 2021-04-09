@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpSession;
 
 import com.example.application.fileservice.StorageService;
 import com.example.application.persistence.Appointment;
+import com.example.application.persistence.DiagnosticReport;
+import com.example.application.persistence.FileUpload;
 import com.example.application.persistence.Modality;
 import com.example.application.persistence.Order;
 import com.example.application.persistence.OrderStatus;
@@ -29,6 +32,8 @@ import com.example.application.persistence.Patient;
 import com.example.application.persistence.Role;
 import com.example.application.persistence.User;
 import com.example.application.repositories.AppointmentRepository;
+import com.example.application.repositories.DiagnosticRepository;
+import com.example.application.repositories.FileUploadRepository;
 import com.example.application.repositories.ModalityRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.application.repositories.OrderStatusRepository;
@@ -51,6 +56,10 @@ public class UserController {
     private ModalityRepository modalityRepository;
     @Autowired
     private OrderStatusRepository orderStatusRepository;
+    @Autowired
+    private FileUploadRepository fileUploadRepository;
+    @Autowired
+    private DiagnosticRepository diagnosticRepository;
     
     private StorageService storageService;
 
@@ -392,6 +401,54 @@ public class UserController {
         model.addAttribute("orders_list", orders_list);
 
         return "orders";
+    }
+
+    @GetMapping("/order/{order_id}")
+    public String getOrder(Model model, @PathVariable("order_id") Long order_id, Principal principal)
+    {
+        Optional<Order> find_order = orderRepository.findById(order_id);
+        if(find_order.isPresent())
+        {
+            Order order = find_order.get();
+
+            Optional<Modality> find_modality = modalityRepository.findById(order.getModality());
+            if(find_modality.isPresent())
+            {
+                Modality modality = find_modality.get();
+
+                order.setModalityObject(modality);
+            }
+
+            model.addAttribute("order", order);
+
+            Optional<Patient> find_patient = patientRepository.findById(order.getPatient());
+            if(find_patient.isPresent())
+            {
+                Patient patient = find_patient.get();
+
+                model.addAttribute("patient", patient);
+            }
+
+            Optional<User> find_referralMD = userRepository.findById(order.getReferral_md());
+            if(find_referralMD.isPresent())
+            {
+                User referralMD = find_referralMD.get();
+
+                model.addAttribute("referral_md", referralMD);
+            }
+
+            Iterable<FileUpload> file_uploads_list = fileUploadRepository.getAllFileUploadsByOrderId(order.getId());
+
+            model.addAttribute("file_uploads_list", file_uploads_list);
+
+            DiagnosticReport diagnostics = diagnosticRepository.getDiagnosticReportByOrderId(order.getId());
+            if(diagnostics != null)
+            {
+                model.addAttribute("diagnostics", diagnostics);
+            }
+        }
+
+        return "order_overview";
     }
 
     @GetMapping("/download/{filename:.+}")
