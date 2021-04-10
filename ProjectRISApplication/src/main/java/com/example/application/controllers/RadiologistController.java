@@ -51,23 +51,6 @@ public class RadiologistController {
     @Autowired
     private PatientsAlertsRepository patientsAlertsRepository;
 
-    @PostMapping("/updatePatient")
-    public String updatePatient(@ModelAttribute("patient") Patient patient, @ModelAttribute("alerts") PatientAlertsList alerts, Model model, BindingResult result)
-    {
-        Long patient_id;
-
-        if(patient.getId() == null)     //  Create new patient
-        {
-            patient_id = patientRepository.save(patient).getId();
-        }
-        else                            //  Use existing patient with patient_id
-        {
-            patient_id = patient.getId();
-        }
-
-        return "redirect:/referral/neworder/" + patient_id;
-    }
-
     @GetMapping("/order/{order_id}")
     public String orderView(Model model, @PathVariable("order_id") Long order_id, Principal principal)
     {
